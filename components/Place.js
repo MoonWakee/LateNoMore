@@ -16,8 +16,8 @@ const goToPlacePage = () => {
     navigation.navigate('PlacePage', {start, end, starred})    
 }
   return (
-    <TouchableOpacity onPress={goToPlacePage}>
-      <View style={styles.container}>
+    <TouchableOpacity onPress={goToPlacePage} style={styles.container}>
+      <View >
         <Text>{start}</Text>
         <Text>{end}</Text>
         <Text>{starred}</Text>
@@ -28,9 +28,10 @@ const goToPlacePage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: "lightgreen",
+    margin: 10,
     height: 150,
-    width: Dimensions.get("window").width / 3,
+    width: (Dimensions.get("window").width - 60) / 3,
     alignItems: "center",
   },
 });
