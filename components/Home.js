@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import {
     SafeAreaView,
     StyleSheet,
@@ -12,6 +12,7 @@ import {
 import { SearchBar } from "@rneui/base";
 import PlaceList from "./PlaceList";
 import { useNavigation } from "@react-navigation/native";
+import AppContext from "../navigation/AppContext";
 
 export default function Home() {
     const searchBarOS = Platform.OS === "ios" ? "ios" : "Android";
@@ -28,6 +29,7 @@ export default function Home() {
     const goToCreate = () => {
         navigation.navigate("CreatePage");
     };
+    const { isOpen } = useContext(AppContext);
 
     const [placeData, setPlaceData] = useState([
         { start: "home", end: "station", starred: true },
@@ -56,33 +58,38 @@ export default function Home() {
         setPlaceData([...placeData, newItem]);
     };
 
+    //return starts here
+
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-            <View style={{ flexDirection: "row" }}>
-                <View style={styles.rowView}>
-                    <SearchBar
-                        style={styles.searchBarStyle}
-                        platform={searchBarOS}
-                        placeholder="Where you at?"
-                        onChangeText={updateSearch1}
-                        value={search1}
-                    />
+        <>
+            {isOpen && <View style={styles.overlay} />}
+
+            <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+                <View style={{ flexDirection: "row" }}>
+                    <View style={styles.rowView}>
+                        <SearchBar
+                            style={styles.searchBarStyle}
+                            platform={searchBarOS}
+                            placeholder="Where you at?"
+                            onChangeText={updateSearch1}
+                            value={search1}
+                        />
+                    </View>
+                    <View style={[styles.rowView]}>
+                        <SearchBar
+                            style={styles.searchBarStyle}
+                            platform={searchBarOS}
+                            placeholder="Where to?"
+                            onChangeText={updateSearch2}
+                            value={search2}
+                        />
+                    </View>
                 </View>
-                <View style={styles.rowView}>
-                    <SearchBar
-                        style={styles.searchBarStyle}
-                        platform={searchBarOS}
-                        placeholder="Where to?"
-                        onChangeText={updateSearch2}
-                        value={search2}
-                    />
-                </View>
-            </View>
-            <PlaceList
-                style={styles.folderView}
-                placeData={filteredPlaceData}
-            />
-            {/* <View style={styles.bottomView}>
+                <PlaceList
+                    style={[styles.folderView, (backgroundColor = "white")]}
+                    placeData={filteredPlaceData}
+                />
+                {/* <View style={styles.bottomView}>
                 <TouchableOpacity onPress={goToCreate}>
                     <View>
                         <Text style={styles.button}>SUP</Text>
@@ -90,7 +97,8 @@ export default function Home() {
                 </TouchableOpacity>
                 
             </View> */}
-        </SafeAreaView>
+            </SafeAreaView>
+        </>
     );
 }
 
@@ -105,18 +113,15 @@ const styles = StyleSheet.create({
     folderView: {
         flex: 1,
         alignItems: "center",
-        backgroundColor: "white",
         justifyContent: "center",
     },
-    bottomView: {
-        flex: 0.2,
-        alignItems: "center",
-        backgroundColor: "white",
-        justifyContent: "center",
-    },
-    button: {
-        backgroundColor: "skyblue",
-        fontSize: 80,
-        fontWeight: "bold",
+    overlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        zIndex: 9999,
     },
 });

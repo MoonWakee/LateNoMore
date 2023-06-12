@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
+import AppContext from "../navigation/AppContext";
 
 export default function PlacePage({ route }) {
     const { start, end, starred } = route.params;
@@ -12,11 +13,14 @@ export default function PlacePage({ route }) {
         });
     }, [navigation, start, end]);
 
+    const {isOpen} = useContext(AppContext);
+
     return (
         <View style={styles.container}>
             <Text>{start}</Text>
             <Text>{end}</Text>
             <Text>{start}</Text>
+            {isOpen && <View style={styles.overlay} />}
         </View>
     );
 }
@@ -26,4 +30,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "white",
     },
+    overlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      zIndex: 9999
+  }
 });
