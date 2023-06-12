@@ -1,24 +1,28 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View, Dimensions } from "react-native";
 import React from "react";
-import Place from "./Place";
+import PlaceCard from "./PlaceCard";
 
-export default function PlaceList({placeData}) {
+export default function PlaceList({ placeData }) {
+    const placeItem = ({ item }) => {
+        return (
+            <PlaceCard
+                start={item.start}
+                end={item.end}
+                starred={item.starred}
+            />
+        );
+    };
 
-  const placeItem = ({ item }) => {
-    return <Place start={item.start} end={item.end} starred={item.starred} />;
-  };
-
-  return (
-    <View style={styles.container}>
-      <FlatList style={styles.container} data={placeData} numColumns={3} renderItem={placeItem} />
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <FlatList data={placeData} numColumns={1} renderItem={placeItem} />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    marginTop: 10
-  }
+    container: {
+        flex: 1,
+        backgroundColor: "white",
+    },
 });

@@ -3,7 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "../components/Home";
 import Alarms from "../components/Alarms";
 import PlacePage from "../components/PlacePage";
-import CreatePage from "../components/CreatePage";
+import DummyPage from "../components/DummyPage";
+import CreateModal from "../components/CreateModal";
 import AppContext from "./AppContext";
 
 import {
@@ -12,12 +13,10 @@ import {
     Text,
     TouchableOpacity,
     View,
-    Modal,
     SafeAreaView,
 } from "react-native";
 import { Icon } from "@rneui/themed";
-import { useState, useRef, useContext } from "react";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { useState, useContext } from "react";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,7 +60,7 @@ function HomeStack() {
                 headerBackTitleVisible: false,
                 animation: "slide_from_right",
                 headerStyle: {
-                    backgroundColor: isOpen ? "rgba(0, 0, 0, 0.5)" : 'white',
+                    backgroundColor: isOpen ? "rgba(0, 0, 0, 0.5)" : "white",
                 },
                 headerLeft: customHeaderBackButton,
             }}
@@ -77,13 +76,16 @@ function HomeStack() {
 }
 
 export default function Tabs() {
-    const sheetRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
-    const snapPoints = ["55%"];
 
     return (
         <AppContext.Provider value={{ isOpen, setIsOpen }}>
-            <SafeAreaView style={{flex: 0, backgroundColor: isOpen ? "rgba(0, 0, 0, 0.5)" : 'white',}} />
+            <SafeAreaView
+                style={{
+                    flex: 0,
+                    backgroundColor: isOpen ? "rgba(0, 0, 0, 0.5)" : "white",
+                }}
+            />
             <SafeAreaView style={styles.container}>
                 <View style={styles.container}>
                     <Tab.Navigator
@@ -92,13 +94,13 @@ export default function Tabs() {
                             tabBarIcon: () => null,
                             tabBarStyle: {
                                 position: "absolute",
-                                bottom: 25,
+                                bottom: 0,
                                 marginLeft: 10,
                                 marginRight: 10,
                                 elevation: 0,
                                 borderRadius: 15,
                                 height: 90,
-                                ...styles.shadow,
+                                ...(!isOpen && styles.shadow),
                             },
                         }}
                     >
@@ -131,8 +133,8 @@ export default function Tabs() {
                             }}
                         />
                         <Tab.Screen
-                            name="Dummy_CreatePage"
-                            component={CreatePage}
+                            name="DummyPage"
+                            component={DummyPage}
                             listeners={() => ({
                                 tabPress: (e) => {
                                     e.preventDefault();
@@ -162,10 +164,12 @@ export default function Tabs() {
                                 headerLeft: false,
                                 headerTitle: "Alarm Page",
                                 headerStyle: {
-                                    backgroundColor: isOpen ? "rgba(0, 0, 0, 0.5)" : 'white',
+                                    backgroundColor: isOpen
+                                        ? "rgba(0, 0, 0, 0.5)"
+                                        : "white",
                                 },
                                 tabBarBadgeStyle: {
-                                    top: 8
+                                    top: 8,
                                 },
                                 tabBarBadge: 3,
                                 tabBarIcon: ({ focused }) => (
@@ -192,16 +196,9 @@ export default function Tabs() {
                             }}
                         />
                     </Tab.Navigator>
-                    {isOpen && (
-                        <BottomSheet
-                            ref={sheetRef}
-                            snapPoints={snapPoints}
-                            enablePanDownToClose={true}
-                            onClose={() => setIsOpen(false)}
-                        >
-                            <Text>Hello</Text>
-                        </BottomSheet>
-                    )}
+                    {/* Create Modal Starts here! */}
+
+                    {isOpen && <CreateModal />}
                 </View>
             </SafeAreaView>
         </AppContext.Provider>

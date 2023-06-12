@@ -7,7 +7,6 @@ import {
     Platform,
     TouchableOpacity,
     Dimensions,
-    Modal,
 } from "react-native";
 import { SearchBar } from "@rneui/base";
 import PlaceList from "./PlaceList";
@@ -54,7 +53,6 @@ export default function Home() {
 
     const addPlaceData = () => {
         const newItem = { start: "new start", end: "new end", starred: false };
-        console.log("added");
         setPlaceData([...placeData, newItem]);
     };
 
@@ -86,9 +84,15 @@ export default function Home() {
                     </View>
                 </View>
                 <PlaceList
-                    style={[styles.folderView, (backgroundColor = "white")]}
+                    style={styles.folderView}
                     placeData={filteredPlaceData}
                 />
+                <View style={styles.bottomView} />
+                <TouchableOpacity onPress={addPlaceData}>
+                    <View>
+                        <Text style={styles.button}>SUP</Text>
+                    </View>
+                </TouchableOpacity>
                 {/* <View style={styles.bottomView}>
                 <TouchableOpacity onPress={goToCreate}>
                     <View>
@@ -124,4 +128,7 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         zIndex: 9999,
     },
+    bottomView: {
+        flex: 0.1,
+    }
 });
