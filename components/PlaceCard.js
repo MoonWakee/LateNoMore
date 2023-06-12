@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
+import { Icon } from "@rneui/base";
 
 export default function PlaceCard({ start, end, starred }) {
 const navigation = useNavigation();
@@ -18,9 +19,16 @@ const goToPlacePage = () => {
     <TouchableWithoutFeedback onPress={goToPlacePage}>
       <View  style={styles.container}>
       <View style={styles.columnContainer}>
-        <Text>{start}</Text>
-        <Text>{end}</Text>
-        <Text>{starred}</Text>
+        <View>
+          <Text>
+            From : Starting point
+          </Text>
+        </View>
+        <View>
+          <Text>
+            To : Ending point
+          </Text>
+        </View>
       </View>
       </View>
     </TouchableWithoutFeedback>
@@ -32,19 +40,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "lightgreen",
     borderRadius: 15,
-    alignItems: "center",
     justifyContent: "center",
     alignSelf: 'center',
     margin: 15,
-    aspectRatio: 1.5, 
-    height: (Dimensions.get("window").width - 40) * 0.75, 
+    aspectRatio: 2, 
+    height: (Dimensions.get("window").width - 40) * 0.6, 
     maxWidth: (Dimensions.get("window").width - 40), 
   },
   columnContainer: {
     flex: 1,
     flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: 'space-around'
   },
 });
 

@@ -10,6 +10,7 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Easing, Keyboard } from "react-native";
 import AppContext from "../navigation/AppContext";
 import { Icon, Input } from "@rneui/base";
+import { addItem } from '../Crud';
 
 export default function CreateModal() {
     const sheetRef = useRef(null);
@@ -71,7 +72,7 @@ export default function CreateModal() {
 
     const closeAndNavigate = () => {
         sheetRef.current.close();
-        
+        addItem("Item 1", 1);
     };
 
     return (
@@ -116,10 +117,13 @@ export default function CreateModal() {
                         contentContainerStyle={styles.transportList}
                     />
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                     onPress={closeAndNavigate}
-                style={styles.saveStyle}>
-                    <Text style={{ color: "white", fontWeight: 'bold' }}>Create</Text>
+                    style={styles.saveStyle}
+                >
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                        Create
+                    </Text>
                 </TouchableOpacity>
             </BottomSheetView>
         </BottomSheet>
