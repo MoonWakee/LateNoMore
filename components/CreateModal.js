@@ -10,13 +10,17 @@ import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Easing, Keyboard } from "react-native";
 import AppContext from "../navigation/AppContext";
 import { Icon, Input } from "@rneui/base";
-import { addItem } from '../Crud';
+import { addItem, getItems } from "../Crud";
+
+
 
 export default function CreateModal() {
     const sheetRef = useRef(null);
-    const snapPoints = ["68%", "78%"];
-    const { setIsOpen } = useContext(AppContext);
-    const input = useRef();
+    const snapPoints = ["68%", "78%", "90%"];
+    const { setIsOpen, setIsModified } = useContext(AppContext);
+    const [input1, setInput1] = useState("");
+    const [input2, setInput2] = useState("");
+
 
     const [keyboardStatus, setKeyboardStatus] = useState(false);
 
@@ -71,24 +75,36 @@ export default function CreateModal() {
     };
 
     const closeAndNavigate = () => {
+        setIsModified(true);
         sheetRef.current.close();
-        addItem("Item 1", 1);
+        const filteredTransportData = transportData.filter(item => item.selected === true);
+        const transports = []
+        filteredTransportData.forEach(item => {
+            transports.push(item.id)
+        })
+        if (input1.trim() != "" && input2.trim() != "") {
+            addItem((start = input1), (end = input2), (data = transports));
+        }
     };
 
     return (
         <BottomSheet
             ref={sheetRef}
-            index={keyboardStatus ? 1 : 0}
+            index={keyboardStatus ? 2 : 1}
             snapPoints={snapPoints}
             enablePanDownToClose={true}
-            onClose={() => setIsOpen(false)}
+            onClose={() => {
+                setIsOpen(false)
+                setIsModified(true)
+            }}
             animationDuration={10}
             animationEasing={Easing.ease}
         >
             <BottomSheetView>
                 <View style={styles.container}>
                     <Input
-                        ref={input}
+                        value={input1}
+                        onChangeText={setInput1}
                         leftIcon={{
                             type: "font-awesome",
                             name: "location-arrow",
@@ -99,7 +115,8 @@ export default function CreateModal() {
                 </View>
                 <View style={styles.container}>
                     <Input
-                        ref={input}
+                        value={input2}
+                        onChangeText={setInput2}
                         leftIcon={{ type: "font-awesome", name: "flag" }}
                         leftIconContainerStyle={{ marginRight: 10 }}
                         placeholder="Enter destination..."

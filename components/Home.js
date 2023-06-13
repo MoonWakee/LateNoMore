@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useMemo, useState, useEffect } from "react";
 import {
     SafeAreaView,
     StyleSheet,
@@ -12,6 +12,7 @@ import { SearchBar } from "@rneui/base";
 import PlaceList from "./PlaceList";
 import { useNavigation } from "@react-navigation/native";
 import AppContext from "../navigation/AppContext";
+import { getItems } from "../Crud";
 
 export default function Home() {
     const searchBarOS = Platform.OS === "ios" ? "ios" : "Android";
@@ -28,15 +29,9 @@ export default function Home() {
     const goToCreate = () => {
         navigation.navigate("CreatePage");
     };
-    const { isOpen } = useContext(AppContext);
+    const { isOpen, isModified, setIsModified } = useContext(AppContext);
 
-    const [placeData, setPlaceData] = useState([
-        { start: "home", end: "station", starred: true },
-        { start: "home", end: "school", starred: true },
-        { start: "school", end: "station", starred: true },
-        { start: "penthouse", end: "airport", starred: false },
-        { start: "home", end: "work", starred: false },
-    ]);
+    const [placeData, setPlaceData] = useState([]);
 
     const filteredPlaceData = useMemo(() => {
         if (search1 || search2) {
@@ -51,10 +46,37 @@ export default function Home() {
         }
     }, [placeData, search1, search2]);
 
-    const addPlaceData = () => {
-        const newItem = { start: "new start", end: "new end", starred: false };
-        setPlaceData([...placeData, newItem]);
+    const addPlaceData = (id, start, end, data) => {
+        const hasDuplicate = placeData.some((p) => p.id === id);
+        if(hasDuplicate) {
+            // console.log('Duplicate existing');
+            return;
+        } else {
+            const newItem = { id: id, start: start, end: end, data: data };
+            setPlaceData([newItem, ...placeData]);
+        }
     };
+
+    useEffect(() => {
+        fetchItems, [];
+    });
+
+    const fetchItems = async () => {
+        getItems()
+            .then((items) => {
+                items.forEach((item) => {
+                    addPlaceData(item.id, item.start, item.end, item.data);
+                });
+            })
+            .catch((error) => {
+                // Handle error
+                console.log(error);
+            });
+    };
+
+    if (isModified) {
+        fetchItems().then(() => setIsModified(false));
+    }
 
     //return starts here
 
@@ -93,14 +115,6 @@ export default function Home() {
                         <Text style={styles.button}>SUP</Text>
                     </View>
                 </TouchableOpacity>
-                {/* <View style={styles.bottomView}>
-                <TouchableOpacity onPress={goToCreate}>
-                    <View>
-                        <Text style={styles.button}>SUP</Text>
-                    </View>
-                </TouchableOpacity>
-                
-            </View> */}
             </SafeAreaView>
         </>
     );
@@ -130,5 +144,5 @@ const styles = StyleSheet.create({
     },
     bottomView: {
         flex: 0.1,
-    }
+    },
 });

@@ -17,15 +17,24 @@ import {
 } from "react-native";
 import { Icon } from "@rneui/themed";
 import { useState, useContext } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const customHeaderBackButton = ({ onPress }) => (
-    <TouchableOpacity onPress={onPress} style={{ marginLeft: 24 }}>
-        <Icon name="arrow-back" size={24} />
-    </TouchableOpacity>
-);
+const customHeaderBackButton = ({ onPress }) => {
+    const { setIsModified } = useContext(AppContext);
+
+    const handlePress = () => {
+        setIsModified(true);
+        onPress();
+    };
+    return (
+        <TouchableOpacity onPress={handlePress} style={{ marginLeft: 24 }}>
+            <Icon name="arrow-back" size={24} />
+        </TouchableOpacity>
+    );
+};
 
 const customCreateButton = ({ children, onPress }) => (
     <TouchableOpacity
@@ -77,9 +86,11 @@ function HomeStack() {
 
 export default function Tabs() {
     const [isOpen, setIsOpen] = useState(false);
-
+    const [isModified, setIsModified] = useState(true);
     return (
-        <AppContext.Provider value={{ isOpen, setIsOpen }}>
+        <AppContext.Provider
+            value={{ isOpen, setIsOpen, isModified, setIsModified }}
+        >
             <SafeAreaView
                 style={{
                     flex: 0,
@@ -107,6 +118,11 @@ export default function Tabs() {
                         <Tab.Screen
                             name="Main"
                             component={HomeStack}
+                            listeners={() => ({
+                                tabPress: (e) => {
+                                    setIsModified(true);
+                                },
+                            })}
                             options={{
                                 headerShown: false,
                                 tabBarIcon: ({ focused }) => (
