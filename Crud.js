@@ -38,6 +38,7 @@ export const addItem = (start, end, data) => {
                                     end,
                                     data
                                 );
+                                return lastInsertId;
                             },
                             (_, error) => {
                                 // Handle error

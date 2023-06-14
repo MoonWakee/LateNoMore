@@ -6,9 +6,10 @@ export default function PlaceList({ placeData }) {
     const placeItem = ({ item }) => {
         return (
             <PlaceCard
+                id={item.id}
                 start={item.start}
                 end={item.end}
-                starred={item.starred}
+                data={item.data}
             />
         );
     };

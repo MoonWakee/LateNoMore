@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { Icon } from "@rneui/themed";
 import { useState, useContext } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,26 +61,113 @@ const customCreateButton = ({ children, onPress }) => (
 );
 
 function HomeStack() {
-    const { isOpen } = useContext(AppContext);
+    const { isOpen, setIsModified, setIsOpen } = useContext(AppContext);
 
     return (
-        <Stack.Navigator
+        <Tab.Navigator
             screenOptions={{
-                headerBackTitleVisible: false,
-                animation: "slide_from_right",
-                headerStyle: {
-                    backgroundColor: isOpen ? "rgba(0, 0, 0, 0.5)" : "white",
+                tabBarShowLabel: false,
+                tabBarIcon: () => null,
+                tabBarStyle: {
+                    position: "absolute",
+                    bottom: 0,
+                    marginLeft: 10,
+                    marginRight: 10,
+                    elevation: 0,
+                    borderRadius: 15,
+                    height: 90,
+                    ...(!isOpen && styles.shadow),
                 },
-                headerLeft: customHeaderBackButton,
             }}
         >
-            <Stack.Screen
-                name="Home"
+            <Tab.Screen
+                name="Main"
                 component={Home}
-                options={{ headerLeft: false, headerTitle: "Get Out" }}
+                listeners={() => ({
+                    tabPress: (e) => {
+                        setIsModified(true);
+                    },
+                })}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: ({ focused }) => (
+                        <View style={styles.iconStyle}>
+                            <Icon
+                                name="home"
+                                type="ionicon"
+                                size={35}
+                                color={focused ? "#e32f45" : "#748c94"}
+                            />
+                            <Text
+                                style={{
+                                    color: focused ? "#e32f45" : "#748c94",
+                                }}
+                            >
+                                Home
+                            </Text>
+                        </View>
+                    ),
+                }}
             />
-            <Stack.Screen name="PlacePage" component={PlacePage} />
-        </Stack.Navigator>
+            <Tab.Screen
+                name="DummyPage"
+                component={DummyPage}
+                listeners={() => ({
+                    tabPress: (e) => {
+                        e.preventDefault();
+                        setIsOpen(!isOpen);
+                    },
+                })}
+                options={{
+                    tabBarIcon: ({ focused }) => (
+                        <Image
+                            source={require("../resources/CreateButton.png")}
+                            resizeMode="contain"
+                            style={{
+                                width: 58,
+                                height: 58,
+                                tintColor: "white",
+                            }}
+                        />
+                    ),
+                    tabBarButton: (props) => customCreateButton(props),
+                }}
+            />
+            <Tab.Screen
+                name="Alarms"
+                component={Alarms}
+                options={{
+                    headerLeft: false,
+                    headerTitle: "Alarm Page",
+                    headerStyle: {
+                        backgroundColor: isOpen
+                            ? "rgba(0, 0, 0, 0.5)"
+                            : "white",
+                    },
+                    tabBarBadgeStyle: {
+                        top: 8,
+                    },
+                    tabBarBadge: 3,
+                    tabBarIcon: ({ focused }) => (
+                        <View style={styles.iconStyle}>
+                            <Icon
+                                name="notifications-circle-outline"
+                                type="ionicon"
+                                size={40}
+                                color={focused ? "#e32f45" : "#748c94"}
+                            />
+                            <Text
+                                style={{
+                                    color: focused ? "#e32f45" : "#748c94",
+                                }}
+                            >
+                                Alarms
+                            </Text>
+                        </View>
+                    ),
+                }}
+            />
+        </Tab.Navigator>
     );
 }
 
@@ -99,119 +186,29 @@ export default function Tabs() {
             />
             <SafeAreaView style={styles.container}>
                 <View style={styles.container}>
-                    <Tab.Navigator
+                    <Stack.Navigator
                         screenOptions={{
-                            tabBarShowLabel: false,
-                            tabBarIcon: () => null,
-                            tabBarStyle: {
-                                position: "absolute",
-                                bottom: 0,
-                                marginLeft: 10,
-                                marginRight: 10,
-                                elevation: 0,
-                                borderRadius: 15,
-                                height: 90,
-                                ...(!isOpen && styles.shadow),
+                            headerBackTitleVisible: false,
+                            animation: "slide_from_right",
+                            headerStyle: {
+                                backgroundColor: isOpen
+                                    ? "rgba(0, 0, 0, 0.5)"
+                                    : "white",
                             },
+                            headerLeft: customHeaderBackButton,
                         }}
                     >
-                        <Tab.Screen
-                            name="Main"
+                        <Stack.Screen
+                            name="Home"
                             component={HomeStack}
-                            listeners={() => ({
-                                tabPress: (e) => {
-                                    setIsModified(true);
-                                },
-                            })}
-                            options={{
-                                headerShown: false,
-                                tabBarIcon: ({ focused }) => (
-                                    <View style={styles.iconStyle}>
-                                        <Icon
-                                            name="home"
-                                            type="ionicon"
-                                            size={35}
-                                            color={
-                                                focused ? "#e32f45" : "#748c94"
-                                            }
-                                        />
-                                        <Text
-                                            style={{
-                                                color: focused
-                                                    ? "#e32f45"
-                                                    : "#748c94",
-                                            }}
-                                        >
-                                            Home
-                                        </Text>
-                                    </View>
-                                ),
-                            }}
-                        />
-                        <Tab.Screen
-                            name="DummyPage"
-                            component={DummyPage}
-                            listeners={() => ({
-                                tabPress: (e) => {
-                                    e.preventDefault();
-                                    setIsOpen(!isOpen);
-                                },
-                            })}
-                            options={{
-                                tabBarIcon: ({ focused }) => (
-                                    <Image
-                                        source={require("../resources/CreateButton.png")}
-                                        resizeMode="contain"
-                                        style={{
-                                            width: 58,
-                                            height: 58,
-                                            tintColor: "white",
-                                        }}
-                                    />
-                                ),
-                                tabBarButton: (props) =>
-                                    customCreateButton(props),
-                            }}
-                        />
-                        <Tab.Screen
-                            name="Alarms"
-                            component={Alarms}
                             options={{
                                 headerLeft: false,
-                                headerTitle: "Alarm Page",
-                                headerStyle: {
-                                    backgroundColor: isOpen
-                                        ? "rgba(0, 0, 0, 0.5)"
-                                        : "white",
-                                },
-                                tabBarBadgeStyle: {
-                                    top: 8,
-                                },
-                                tabBarBadge: 3,
-                                tabBarIcon: ({ focused }) => (
-                                    <View style={styles.iconStyle}>
-                                        <Icon
-                                            name="notifications-circle-outline"
-                                            type="ionicon"
-                                            size={40}
-                                            color={
-                                                focused ? "#e32f45" : "#748c94"
-                                            }
-                                        />
-                                        <Text
-                                            style={{
-                                                color: focused
-                                                    ? "#e32f45"
-                                                    : "#748c94",
-                                            }}
-                                        >
-                                            Alarms
-                                        </Text>
-                                    </View>
-                                ),
+                                headerTitle: "Get Out",
                             }}
                         />
-                    </Tab.Navigator>
+                        <Stack.Screen name="PlacePage" component={PlacePage} />
+                    </Stack.Navigator>
+
                     {/* Create Modal Starts here! */}
 
                     {isOpen && <CreateModal />}

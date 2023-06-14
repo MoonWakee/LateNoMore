@@ -9,12 +9,12 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "@rneui/base";
 
-export default function PlaceCard({ start, end, starred }) {
+export default function PlaceCard({ id, start, end, data }) {
     const navigation = useNavigation();
-
     const goToPlacePage = () => {
-        navigation.navigate("PlacePage", { start, end, starred });
+        navigation.navigate("PlacePage", { id, start, end, data });
     };
+
     return (
         <TouchableWithoutFeedback onPress={goToPlacePage}>
             <View style={styles.container}>
@@ -26,7 +26,6 @@ export default function PlaceCard({ start, end, starred }) {
                                 name="location-arrow"
                                 size={30}
                                 width={30}
-                                
                             />
                             <View style={styles.textParent}>
                                 <Text style={styles.textStyle}>{start}</Text>
@@ -49,22 +48,57 @@ export default function PlaceCard({ start, end, starred }) {
                             </View>
                         </View>
                     </View>
-                      <View style={styles.timeContainer}>
+                    <View style={styles.timeContainer}>
                         <View style={styles.row}>
-                      <Icon type="font-awesome-5" name="walking" style={styles.transContainer}/>
-                      <Icon type="font-awesome-5" name="car" style={styles.transContainer}/>
-                      <Icon type="font-awesome-5" name="bus" style={styles.transContainer}/>
-                      <Icon type="font-awesome-5" name="train" style={styles.transContainer}/>
-                      <Icon type="font-awesome-5" name="bicycle" style={styles.transContainer} />
-                      <Icon type="ionicon" name="boat" style={styles.transContainer}/>
-                      </View>
-                      </View>
+                            {data.includes(1) && (
+                                <Icon
+                                    type="font-awesome-5"
+                                    name="walking"
+                                    style={styles.transContainer}
+                                />
+                            )}
+                            {data.includes(2) && (
+                                <Icon
+                                    type="font-awesome-5"
+                                    name="car"
+                                    style={styles.transContainer}
+                                />
+                            )}
+                            {data.includes(3) && (
+                                <Icon
+                                    type="font-awesome-5"
+                                    name="bus"
+                                    style={styles.transContainer}
+                                />
+                            )}
+                            {data.includes(4) && (
+                                <Icon
+                                    type="font-awesome-5"
+                                    name="train"
+                                    style={styles.transContainer}
+                                />
+                            )}
+                            {data.includes(5) && (
+                                <Icon
+                                    type="font-awesome-5"
+                                    name="bicycle"
+                                    style={styles.transContainer}
+                                />
+                            )}
+                            {data.includes(6) && (
+                                <Icon
+                                    type="ionicon"
+                                    name="boat"
+                                    style={styles.transContainer}
+                                />
+                            )}
+                        </View>
+                    </View>
                 </View>
             </View>
         </TouchableWithoutFeedback>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -87,9 +121,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly",
         alignItems: "flex-start",
         marginLeft: "10%",
-        marginRight: "10%"
+        marginRight: "10%",
     },
-     transContainer: {
+    transContainer: {
         width: 40,
         height: 40,
         borderRadius: 20,
@@ -97,13 +131,13 @@ const styles = StyleSheet.create({
         borderColor: "black",
         alignItems: "center",
         justifyContent: "center",
-        margin: '2%',
+        margin: "2%",
     },
     timeContainer: {
         flex: 1,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        alignSelf: 'center',
+        justifyContent: "space-between",
+        alignItems: "center",
+        alignSelf: "center",
     },
     lineParent: {
         marginLeft: "10%",
@@ -125,7 +159,7 @@ const styles = StyleSheet.create({
     textStyle: {
         fontSize: 22,
         maxWidth: "90%",
-        textAlign: "center"
+        textAlign: "center",
     },
     textParent: {
         flex: 1,

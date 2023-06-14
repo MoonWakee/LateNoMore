@@ -11,7 +11,7 @@ import { Easing, Keyboard } from "react-native";
 import AppContext from "../navigation/AppContext";
 import { Icon, Input } from "@rneui/base";
 import { addItem, getItems } from "../Crud";
-
+import { useNavigation } from "@react-navigation/native";
 
 
 export default function CreateModal() {
@@ -74,6 +74,12 @@ export default function CreateModal() {
         );
     };
 
+    const navigation = useNavigation();
+
+    const goToPlacePage = (id, start, end, date) => {
+        navigation.navigate("PlacePage", { id, start, end, data });
+    };
+
     const closeAndNavigate = () => {
         setIsModified(true);
         sheetRef.current.close();
@@ -83,9 +89,10 @@ export default function CreateModal() {
             transports.push(item.id)
         })
         if (input1.trim() != "" && input2.trim() != "") {
-            addItem((start = input1), (end = input2), (data = transports));
-        }
+            const id = addItem((start = input1), (end = input2), (data = transports));
+            goToPlacePage(id, start, end, data)
     };
+}
 
     return (
         <BottomSheet

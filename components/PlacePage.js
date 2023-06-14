@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import AppContext from "../navigation/AppContext";
 
 export default function PlacePage({ route }) {
-    const { start, end, starred } = route.params;
+    const { id, start, end, data } = route.params;
     const navigation = useNavigation();
 
     useEffect(() => {
