@@ -88,7 +88,7 @@ export default function CreateModal() {
         filteredTransportData.forEach(item => {
             transports.push(item.id)
         })
-        if (input1.trim() != "" && input2.trim() != "") {
+        if (input1.trim() != "" && input2.trim() != "" && transports.length != 0) {
             const id = addItem((start = input1), (end = input2), (data = transports));
             goToPlacePage(id, start, end, data)
     };

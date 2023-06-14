@@ -49,49 +49,58 @@ export default function PlaceCard({ id, start, end, data }) {
                         </View>
                     </View>
                     <View style={styles.timeContainer}>
-                        <View style={styles.row}>
-                            {data.includes(1) && (
-                                <Icon
-                                    type="font-awesome-5"
-                                    name="walking"
-                                    style={styles.transContainer}
-                                />
-                            )}
-                            {data.includes(2) && (
-                                <Icon
-                                    type="font-awesome-5"
-                                    name="car"
-                                    style={styles.transContainer}
-                                />
-                            )}
-                            {data.includes(3) && (
-                                <Icon
-                                    type="font-awesome-5"
-                                    name="bus"
-                                    style={styles.transContainer}
-                                />
-                            )}
-                            {data.includes(4) && (
-                                <Icon
-                                    type="font-awesome-5"
-                                    name="train"
-                                    style={styles.transContainer}
-                                />
-                            )}
-                            {data.includes(5) && (
-                                <Icon
-                                    type="font-awesome-5"
-                                    name="bicycle"
-                                    style={styles.transContainer}
-                                />
-                            )}
-                            {data.includes(6) && (
-                                <Icon
-                                    type="ionicon"
-                                    name="boat"
-                                    style={styles.transContainer}
-                                />
-                            )}
+                        <View
+                            style={{
+                                flex: 1,
+                                alignItems: "center",
+                                justifyContent: 'center',
+                                maxWidth: "90%",
+                            }}
+                        >
+                            <View style={styles.iconRow}>
+                                {data.includes(1) && (
+                                    <Icon
+                                        type="font-awesome-5"
+                                        name="walking"
+                                        style={styles.transContainer}
+                                    />
+                                )}
+                                {data.includes(2) && (
+                                    <Icon
+                                        type="font-awesome-5"
+                                        name="car"
+                                        style={styles.transContainer}
+                                    />
+                                )}
+                                {data.includes(3) && (
+                                    <Icon
+                                        type="font-awesome-5"
+                                        name="bus"
+                                        style={styles.transContainer}
+                                    />
+                                )}
+                                {data.includes(4) && (
+                                    <Icon
+                                        type="font-awesome-5"
+                                        name="train"
+                                        style={styles.transContainer}
+                                    />
+                                )}
+                                {data.includes(5) && (
+                                    <Icon
+                                        type="font-awesome-5"
+                                        name="bicycle"
+                                        style={styles.transContainer}
+                                    />
+                                )}
+                                {data.includes(6) && (
+                                    <Icon
+                                        type="ionicon"
+                                        name="boat"
+                                        style={styles.transContainer}
+                                    />
+                                )}
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -131,11 +140,12 @@ const styles = StyleSheet.create({
         borderColor: "black",
         alignItems: "center",
         justifyContent: "center",
-        margin: "2%",
+        margin: 4,
     },
     timeContainer: {
         flex: 1,
-        justifyContent: "space-between",
+        // backgroundColor: 'gray',
+        justifyContent: "center",
         alignItems: "center",
         alignSelf: "center",
     },
@@ -163,5 +173,10 @@ const styles = StyleSheet.create({
     },
     textParent: {
         flex: 1,
+    },
+    iconRow: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center"
     },
 });

@@ -110,11 +110,6 @@ export default function Home() {
                     placeData={filteredPlaceData}
                 />
                 <View style={styles.bottomView} />
-                <TouchableOpacity onPress={addPlaceData}>
-                    <View>
-                        <Text style={styles.button}>SUP</Text>
-                    </View>
-                </TouchableOpacity>
             </SafeAreaView>
         </>
     );
@@ -143,6 +138,6 @@ const styles = StyleSheet.create({
         zIndex: 9999,
     },
     bottomView: {
-        flex: 0.1,
+        height: 90
     },
 });

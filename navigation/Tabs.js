@@ -17,7 +17,6 @@ import {
 } from "react-native";
 import { Icon } from "@rneui/themed";
 import { useState, useContext } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -69,6 +68,7 @@ function HomeStack() {
                 tabBarShowLabel: false,
                 tabBarIcon: () => null,
                 tabBarStyle: {
+                    headerShown: false,
                     position: "absolute",
                     bottom: 0,
                     marginLeft: 10,
@@ -89,7 +89,7 @@ function HomeStack() {
                     },
                 })}
                 options={{
-                    headerShown: false,
+                    headerTitle: "Get Out",
                     tabBarIcon: ({ focused }) => (
                         <View style={styles.iconStyle}>
                             <Icon
@@ -203,7 +203,7 @@ export default function Tabs() {
                             component={HomeStack}
                             options={{
                                 headerLeft: false,
-                                headerTitle: "Get Out",
+                                headerShown: false
                             }}
                         />
                         <Stack.Screen name="PlacePage" component={PlacePage} />
