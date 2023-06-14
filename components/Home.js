@@ -53,26 +53,31 @@ export default function Home() {
             return;
         } else {
             const newItem = { id: id, start: start, end: end, data: data };
-            setPlaceData([newItem, ...placeData]);
+            setPlaceData([placeData, ...newItem]);
         }
+
     };
 
     useEffect(() => {
-        fetchItems, [];
-    });
+        fetchItems();
+    }, []);
 
     const fetchItems = async () => {
-        getItems()
-            .then((items) => {
-                items.forEach((item) => {
-                    addPlaceData(item.id, item.start, item.end, item.data);
-                });
-            })
-            .catch((error) => {
-                // Handle error
-                console.log(error);
-            });
-    };
+        try {
+          const items = await getItems();
+          //Reversing the item in items so that the newly created is shown on top
+          const newData = items.reverse().map((item) => ({
+            id: item.id,
+            start: item.start,
+            end: item.end,
+            data: item.data,
+          }));
+      
+          setPlaceData(newData);
+        } catch (error) {
+          console.log(error);
+        }
+      };
 
     if (isModified) {
         fetchItems().then(() => setIsModified(false));

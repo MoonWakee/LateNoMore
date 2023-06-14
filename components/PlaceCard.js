@@ -32,9 +32,9 @@ export default function PlaceCard({ id, start, end, data }) {
                             </View>
                         </View>
                     </View>
-                    <View style={styles.lineParent}>
+                    {/* <View style={styles.lineParent}>
                         <View style={styles.line} />
-                    </View>
+                    </View> */}
                     <View style={styles.iconContainer}>
                         <View style={styles.row}>
                             <Icon
@@ -53,7 +53,7 @@ export default function PlaceCard({ id, start, end, data }) {
                             style={{
                                 flex: 1,
                                 alignItems: "center",
-                                justifyContent: 'center',
+                                justifyContent: "center",
                                 maxWidth: "90%",
                             }}
                         >
@@ -117,9 +117,17 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignSelf: "center",
         margin: 15,
-        aspectRatio: 2,
-        height: (Dimensions.get("window").width - 40) * 0.6,
-        maxWidth: Dimensions.get("window").width - 40,
+        aspectRatio: 3.3,
+        height: (Dimensions.get("window").width - 40) * 0.3,
+        Width: Dimensions.get("window").width - 40,
+        shadowColor: "black",
+        shadowOffset: {
+            width: 0,
+            height: 5,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.5,
+        elevation: 5,
     },
     columnContainer: {
         flex: 1,
@@ -175,8 +183,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     iconRow: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center"
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
     },
 });

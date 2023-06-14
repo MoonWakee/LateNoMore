@@ -8,7 +8,7 @@ export const initializeDatabase = () => {
             "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, start TEXT, end TEXT, count INT, data JSON)"
             // "DROP TABLE IF EXISTS items"
         );
-        console.log("deleted table");
+        // console.log("deleted table");
     });
 };
 

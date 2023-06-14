@@ -90,6 +90,11 @@ function HomeStack() {
                 })}
                 options={{
                     headerTitle: "Get Out",
+                    headerStyle: {
+                        backgroundColor: isOpen
+                            ? "rgba(0, 0, 0, 0.5)"
+                            : "white",
+                    },
                     tabBarIcon: ({ focused }) => (
                         <View style={styles.iconStyle}>
                             <Icon
