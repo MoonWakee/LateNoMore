@@ -21,7 +21,7 @@ export default function Alarms() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F2BA93",
+        backgroundColor: "white",
     },
     rowView: {
         flexDirection: "row",

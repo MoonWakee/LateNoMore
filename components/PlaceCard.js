@@ -95,22 +95,21 @@ export default function PlaceCard({ id, start, end, data }) {
     };
 
     const sizeChanger = (len) => {
-      if(len <= 2){
-        return 26;
-      }
-      if(len == 3){
-        return 22
-      }
-      if (len == 4){
-        return 18
-      }
-      if (len == 5){
-        return 15
-      }
-      else {
-        return 11
-      }
-    }
+        if (len <= 2) {
+            return 26;
+        }
+        if (len == 3) {
+            return 22;
+        }
+        if (len == 4) {
+            return 18;
+        }
+        if (len == 5) {
+            return 15;
+        } else {
+            return 11;
+        }
+    };
     const IconDivs = () => {
         return (
             <View style={styles.iconRow}>
@@ -131,7 +130,8 @@ export default function PlaceCard({ id, start, end, data }) {
                         style={containerChanger(arr.length)}
                         backgroundColor="#a8bbd6"
                         color="white"
-                        size={sizeChanger(arr.length)}                    />
+                        size={sizeChanger(arr.length)}
+                    />
                 )}
                 {data.includes(3) && (
                     <Icon
@@ -140,7 +140,8 @@ export default function PlaceCard({ id, start, end, data }) {
                         style={containerChanger(arr.length)}
                         backgroundColor="#a8bbd6"
                         color="white"
-                        size={sizeChanger(arr.length)}                    />
+                        size={sizeChanger(arr.length)}
+                    />
                 )}
                 {data.includes(4) && (
                     <Icon
@@ -149,7 +150,8 @@ export default function PlaceCard({ id, start, end, data }) {
                         style={containerChanger(arr.length)}
                         backgroundColor="#a8bbd6"
                         color="white"
-                        size={sizeChanger(arr.length)}                    />
+                        size={sizeChanger(arr.length)}
+                    />
                 )}
                 {data.includes(5) && (
                     <Icon
@@ -158,7 +160,8 @@ export default function PlaceCard({ id, start, end, data }) {
                         style={containerChanger(arr.length)}
                         backgroundColor="#a8bbd6"
                         color="white"
-                        size={sizeChanger(arr.length)}                    />
+                        size={sizeChanger(arr.length)}
+                    />
                 )}
                 {data.includes(6) && (
                     <Icon
@@ -167,12 +170,13 @@ export default function PlaceCard({ id, start, end, data }) {
                         style={containerChanger(arr.length)}
                         backgroundColor="#a8bbd6"
                         color="white"
-                        size={sizeChanger(arr.length)}                    />
+                        size={sizeChanger(arr.length)}
+                    />
                 )}
             </View>
         );
     };
-    
+
     return (
         <TouchableWithoutFeedback onPress={goToPlacePage}>
             <View style={styles.container}>
@@ -187,42 +191,50 @@ export default function PlaceCard({ id, start, end, data }) {
                     </View>
                     <View style={styles.columnContainer}>
                         <View style={styles.iconContainer}>
-                            <Input
-                                leftIcon={{
-                                    type: "font-awesome",
-                                    name: "location-arrow",
-                                    color: "#2596be",
-                                    size: 30,
-                                    width: 30
-                                }}
-                                leftIconContainerStyle={{ marginRight: 10 }}
-                                placeholder="Enter current location..."
-                                disabled={true}
-                                disabledInputStyle={{
-                                    color: "black",
-                                    fontWeight: "bold",
-                                }}
-                                // inputStyle={{color: 'black'}}
-                                value={start}
-                            ></Input>
+                            <Icon
+                                type="font-awesome"
+                                name="location-arrow"
+                                color="#2596be"
+                                size={30}
+                                width={30}
+                            />
+                            <View style={{ marginLeft: 20, marginTop: 5 }}>
+                                <Text
+                                    style={{
+                                        fontSize: 18,
+                                        fontWeight: "bold",
+                                        color: "gray",
+                                    }}
+                                >
+                                    {start.length < 27
+                                        ? `${start}`
+                                        : `${start.substring(0, 26)}...`}
+                                </Text>
+                            </View>
                         </View>
                         <View style={styles.iconContainer}>
-                            <Input
-                                leftIcon={{
-                                    type: "font-awesome",
-                                    name: "flag",
-                                    color: "#cd5554",
-                                    width: 30
-                                }}
-                                leftIconContainerStyle={{ marginRight: 10 }}
-                                placeholder="Enter destination..."
-                                disabled={true}
-                                disabledInputStyle={{
-                                    color: "black",
-                                    fontWeight: "bold",
-                                }}
-                                value={end}
-                            ></Input>
+                            <Icon
+                                type="font-awesome"
+                                name="flag"
+                                color="#cd5554"
+                                size={30}
+                                width={30}
+                            />
+                            <View style={{ marginLeft: 20, marginTop: 5 }}>
+                                <Text
+                                    style={{
+                                        fontSize: 18,
+                                        fontWeight: "bold",
+                                        color: "gray",
+                                        numberOfLines: 1,
+                                        ellipsizeMode: "tail",
+                                    }}
+                                >
+                                    {end.length < 27
+                                        ? `${end}`
+                                        : `${end.substring(0, 26)}...`}{" "}
+                                </Text>
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -263,7 +275,13 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         flex: 1,
-        marginRight: "7%",
+        flexDirection: "row",
+        paddingTop: 12,
+        marginBottom: 12,
+        marginLeft: 5,
+        marginRight: 35,
+        borderBottomWidth: 1,
+        borderColor: "gray",
     },
     lineParent: {
         marginLeft: "10%",
