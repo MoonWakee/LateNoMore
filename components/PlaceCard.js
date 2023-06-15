@@ -5,9 +5,10 @@ import {
     Dimensions,
     TouchableWithoutFeedback,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Icon } from "@rneui/base";
+import { Icon, Input } from "@rneui/base";
+import DashedLine from "react-native-dashed-line";
 
 export default function PlaceCard({ id, start, end, data }) {
     const navigation = useNavigation();
@@ -15,92 +16,213 @@ export default function PlaceCard({ id, start, end, data }) {
         navigation.navigate("PlacePage", { id, start, end, data });
     };
 
+    const [arr, setArr] = useState([]);
+
+    const iconSettler = (data) => {
+        const new_data = data.substring(1, data.length - 1);
+        const old_arr = new_data.split(",");
+        const new_arr = [];
+        old_arr.forEach((e) => new_arr.push(parseInt(e)));
+        setArr(new_arr);
+    };
+
+    useEffect(() => {
+        iconSettler(data);
+    }, [data]);
+
+    console.log(arr);
+
+    const containerChanger = (len) => {
+        if (len <= 2) {
+            return {
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                borderWidth: 3,
+                borderColor: "#a8bbd6",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: 4,
+            };
+        }
+        if (len == 3) {
+            return {
+                width: 35,
+                height: 35,
+                margin: 4,
+                borderRadius: 22,
+                borderWidth: 3,
+                borderColor: "#a8bbd6",
+                alignItems: "center",
+                justifyContent: "center",
+            };
+        }
+        if (len == 4) {
+            return {
+                width: 30,
+                height: 30,
+                margin: 1.5,
+                borderRadius: 20,
+                borderWidth: 3,
+                borderColor: "#a8bbd6",
+                alignItems: "center",
+                justifyContent: "center",
+            };
+        }
+        if (len == 5) {
+            return {
+                width: 24,
+                height: 24,
+                margin: 1,
+                borderRadius: 20,
+                borderWidth: 3,
+                borderColor: "#a8bbd6",
+                alignItems: "center",
+                justifyContent: "center",
+            };
+        } else {
+            return {
+                width: 20,
+                height: 20,
+                margin: 1,
+                borderRadius: 20,
+                borderWidth: 3,
+                borderColor: "#a8bbd6",
+                alignItems: "center",
+                justifyContent: "center",
+            };
+        }
+    };
+
+    const sizeChanger = (len) => {
+      if(len <= 2){
+        return 26;
+      }
+      if(len == 3){
+        return 22
+      }
+      if (len == 4){
+        return 18
+      }
+      if (len == 5){
+        return 15
+      }
+      else {
+        return 11
+      }
+    }
+    const IconDivs = () => {
+        return (
+            <View style={styles.iconRow}>
+                {data.includes(1) && (
+                    <Icon
+                        type="font-awesome-5"
+                        name="walking"
+                        style={containerChanger(arr.length)}
+                        backgroundColor="#a8bbd6"
+                        color="white"
+                        size={sizeChanger(arr.length)}
+                    />
+                )}
+                {data.includes(2) && (
+                    <Icon
+                        type="font-awesome-5"
+                        name="car"
+                        style={containerChanger(arr.length)}
+                        backgroundColor="#a8bbd6"
+                        color="white"
+                        size={sizeChanger(arr.length)}                    />
+                )}
+                {data.includes(3) && (
+                    <Icon
+                        type="font-awesome-5"
+                        name="bus"
+                        style={containerChanger(arr.length)}
+                        backgroundColor="#a8bbd6"
+                        color="white"
+                        size={sizeChanger(arr.length)}                    />
+                )}
+                {data.includes(4) && (
+                    <Icon
+                        type="font-awesome-5"
+                        name="train"
+                        style={containerChanger(arr.length)}
+                        backgroundColor="#a8bbd6"
+                        color="white"
+                        size={sizeChanger(arr.length)}                    />
+                )}
+                {data.includes(5) && (
+                    <Icon
+                        type="font-awesome-5"
+                        name="bicycle"
+                        style={containerChanger(arr.length)}
+                        backgroundColor="#a8bbd6"
+                        color="white"
+                        size={sizeChanger(arr.length)}                    />
+                )}
+                {data.includes(6) && (
+                    <Icon
+                        type="ionicon"
+                        name="boat"
+                        style={containerChanger(arr.length)}
+                        backgroundColor="#a8bbd6"
+                        color="white"
+                        size={sizeChanger(arr.length)}                    />
+                )}
+            </View>
+        );
+    };
     return (
         <TouchableWithoutFeedback onPress={goToPlacePage}>
             <View style={styles.container}>
-                <View style={styles.columnContainer}>
-                    <View style={styles.iconContainer}>
+                {/* <DashedLine dashLength={10} dashThickness={10} dashGap={5} dashStyle={{ borderRadius: 10 }}  dashColor='#c32626' /> */}
+                <View style={styles.row}>
+                    <View style={styles.leftTrans}>
                         <View style={styles.row}>
-                            <Icon
-                                type="font-awesome"
-                                name="location-arrow"
-                                size={30}
-                                width={30}
-                            />
-                            <View style={styles.textParent}>
-                                <Text style={styles.textStyle}>{start}</Text>
+                            <IconDivs />
+                            <View style={styles.lineRow}>
+                                <Text></Text>
                             </View>
                         </View>
                     </View>
-                    {/* <View style={styles.lineParent}>
-                        <View style={styles.line} />
-                    </View> */}
-                    <View style={styles.iconContainer}>
-                        <View style={styles.row}>
-                            <Icon
-                                type="font-awesome"
-                                name="flag"
-                                size={30}
-                                width={30}
-                            />
-                            <View style={styles.textParent}>
-                                <Text style={styles.textStyle}>{end}</Text>
-                            </View>
+                    <View style={styles.columnContainer}>
+                        <View style={styles.iconContainer}>
+                            <Input
+                                leftIcon={{
+                                    type: "font-awesome",
+                                    name: "location-arrow",
+                                    color: "#2596be",
+                                    size: 30,
+                                    width: 30
+                                }}
+                                leftIconContainerStyle={{ marginRight: 10 }}
+                                placeholder="Enter current location..."
+                                disabled={true}
+                                disabledInputStyle={{
+                                    color: "black",
+                                    fontWeight: "bold",
+                                }}
+                                // inputStyle={{color: 'black'}}
+                                value={start}
+                            ></Input>
                         </View>
-                    </View>
-                    <View style={styles.timeContainer}>
-                        <View
-                            style={{
-                                flex: 1,
-                                alignItems: "center",
-                                justifyContent: "center",
-                                maxWidth: "90%",
-                            }}
-                        >
-                            <View style={styles.iconRow}>
-                                {data.includes(1) && (
-                                    <Icon
-                                        type="font-awesome-5"
-                                        name="walking"
-                                        style={styles.transContainer}
-                                    />
-                                )}
-                                {data.includes(2) && (
-                                    <Icon
-                                        type="font-awesome-5"
-                                        name="car"
-                                        style={styles.transContainer}
-                                    />
-                                )}
-                                {data.includes(3) && (
-                                    <Icon
-                                        type="font-awesome-5"
-                                        name="bus"
-                                        style={styles.transContainer}
-                                    />
-                                )}
-                                {data.includes(4) && (
-                                    <Icon
-                                        type="font-awesome-5"
-                                        name="train"
-                                        style={styles.transContainer}
-                                    />
-                                )}
-                                {data.includes(5) && (
-                                    <Icon
-                                        type="font-awesome-5"
-                                        name="bicycle"
-                                        style={styles.transContainer}
-                                    />
-                                )}
-                                {data.includes(6) && (
-                                    <Icon
-                                        type="ionicon"
-                                        name="boat"
-                                        style={styles.transContainer}
-                                    />
-                                )}
-                            </View>
+                        <View style={styles.iconContainer}>
+                            <Input
+                                leftIcon={{
+                                    type: "font-awesome",
+                                    name: "flag",
+                                    color: "#cd5554",
+                                    width: 30
+                                }}
+                                leftIconContainerStyle={{ marginRight: 10 }}
+                                placeholder="Enter destination..."
+                                disabled={true}
+                                disabledInputStyle={{
+                                    color: "black",
+                                    fontWeight: "bold",
+                                }}
+                                value={end}
+                            ></Input>
                         </View>
                     </View>
                 </View>
@@ -113,7 +235,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // backgroundColor: "#A7BAD3",
-        backgroundColor: 'white',
+        backgroundColor: "white",
         borderRadius: 15,
         justifyContent: "center",
         // borderColor: "#dd602d",
@@ -127,12 +249,12 @@ const styles = StyleSheet.create({
         aspectRatio: 3,
         height: (Dimensions.get("window").width - 40) * 0.34,
         Width: Dimensions.get("window").width - 60,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowRadius: 10,
         shadowOpacity: 0.2,
         shadowOffset: {
-          width: 0,
-          height: 5,
+            width: 0,
+            height: 5,
         },
     },
     columnContainer: {
@@ -141,27 +263,7 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         flex: 1,
-        justifyContent: "space-evenly",
-        alignItems: "flex-start",
-        marginLeft: "10%",
-        marginRight: "10%",
-    },
-    transContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        borderWidth: 1.5,
-        borderColor: "black",
-        alignItems: "center",
-        justifyContent: "center",
-        margin: 4,
-    },
-    timeContainer: {
-        flex: 1,
-        // backgroundColor: 'gray',
-        justifyContent: "center",
-        alignItems: "center",
-        alignSelf: "center",
+        marginRight: "7%",
     },
     lineParent: {
         marginLeft: "10%",
@@ -190,7 +292,21 @@ const styles = StyleSheet.create({
     },
     iconRow: {
         flex: 1,
-        flexDirection: "row",
+        // backgroundColor: "#F2BA93",
+        flexDirection: "column",
         alignItems: "center",
+    },
+    lineRow: {
+        height: (Dimensions.get("window").width - 40) * 0.34,
+        width: 7,
+        backgroundColor: "#F2BA93",
+        marginRight: 10,
+        // alignItems: "center",
+        // flexDirection: "row",
+    },
+    leftTrans: {
+        flex: 0.25,
+        alignItems: "center",
+        // backgroundColor: 'red',
     },
 });

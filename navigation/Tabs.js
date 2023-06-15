@@ -14,12 +14,10 @@ import {
     TouchableOpacity,
     View,
     SafeAreaView,
-    Animated,
 } from "react-native";
 import { Icon } from "@rneui/themed";
 import { useState, useContext, useRef, useEffect } from "react";
-import * as Animatable from "react-native-animatable";
-import { StatusBar } from "expo-status-bar";
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -94,28 +92,25 @@ function HomeStack() {
                     },
                 })}
                 options={{
-                    headerTitle: "I love ddj, ddj loves me",
+                    headerTitle: "Get Out",
                     headerTintColor: "white",
                     headerTitleStyle: {
                       fontWeight: 700  
                     },
                     headerStyle: {
-                        // backgroundColor: isOpen
-                        //     ? "rgba(0, 0, 0, 0.5)"
-                        //     : "white",
-
-                        //new color
-                        backgroundColor: "#a8bbd6",
+                        backgroundColor: isOpen
+                            ? "#545d6b"
+                            : "#a8bbd6",
                     },
                     tabBarIcon: ({ focused }) => (
                         <View
                             style={[
                                 styles.iconStyle,
-                                {
-                                    backgroundColor: focused
-                                        ? "white"
-                                        : "#a8bbd6",
-                                },
+                                // {
+                                //     backgroundColor: focused
+                                //         ? "white"
+                                //         : "#a8bbd6",
+                                // },
                             ]}
                         >
                             <Icon
@@ -174,12 +169,15 @@ function HomeStack() {
                 name="Alarms"
                 component={Alarms}
                 options={{
-                    headerLeft: false,
-                    headerTitle: "Alarm Page",
+                    headerTitle: "Alarms",
+                    headerTintColor: "white",
+                    headerTitleStyle: {
+                      fontWeight: 700  
+                    },
                     headerStyle: {
                         backgroundColor: isOpen
-                            ? "rgba(0, 0, 0, 0.5)"
-                            : "white",
+                            ? "#545d6b"
+                            : "#a8bbd6",
                     },
                     tabBarBadgeStyle: {
                         top: 8,
@@ -189,11 +187,11 @@ function HomeStack() {
                         <View
                             style={[
                                 styles.iconStyle,
-                                {
-                                    backgroundColor: focused
-                                        ? "white"
-                                        : "#a8bbd6",
-                                },
+                                // {
+                                //     backgroundColor: focused
+                                //         ? "white"
+                                //         : "#a8bbd6",
+                                // },
                             ]}
                         >
                             <Icon
@@ -231,15 +229,6 @@ function HomeStack() {
 export default function Tabs() {
     const [isOpen, setIsOpen] = useState(false);
     const [isModified, setIsModified] = useState(true);
-    const colorAnimation = useRef(new Animated.Value(1)).current;
-
-    const startAnimation = () => {
-        Animated.timing(colorAnimation, {
-            toValue: 0,
-            duration: 1000,
-            useNativeDriver: false,
-        }).start();
-    };
 
     return (
         <AppContext.Provider
@@ -248,7 +237,7 @@ export default function Tabs() {
             <SafeAreaView
                 style={{
                     flex: 0,
-                    backgroundColor: "#a8bbd6",
+                    backgroundColor: isOpen ? '#545d6b' : "#a8bbd6",
                 }}
             />
             {/* <SafeAreaView style={styles.container}> */}

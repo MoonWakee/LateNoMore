@@ -87,7 +87,7 @@ export default function Home() {
     return (
         <>
             {isOpen && <View style={styles.overlay} />}
-            <SafeAreaView style={{ flex: 1, backgroundColor: "#F2BA93" }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
                 <View
                     style={{
                         flexDirection: "row",
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     },
     bottomView: {
         height: 90,
-        backgroundColor: "#F2BA93",
+        backgroundColor: "white",
         // backgroundColor: "#a8bbd6",
     },
     arc: {

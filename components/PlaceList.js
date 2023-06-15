@@ -24,7 +24,7 @@ export default function PlaceList({ placeData }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#F2BA93"
+        backgroundColor: "white"
 
     },
 });
