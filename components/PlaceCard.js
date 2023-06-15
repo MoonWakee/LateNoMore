@@ -172,10 +172,10 @@ export default function PlaceCard({ id, start, end, data }) {
             </View>
         );
     };
+    
     return (
         <TouchableWithoutFeedback onPress={goToPlacePage}>
             <View style={styles.container}>
-                {/* <DashedLine dashLength={10} dashThickness={10} dashGap={5} dashStyle={{ borderRadius: 10 }}  dashColor='#c32626' /> */}
                 <View style={styles.row}>
                     <View style={styles.leftTrans}>
                         <View style={styles.row}>

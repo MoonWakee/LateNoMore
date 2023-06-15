@@ -29,7 +29,7 @@ export default function Home() {
     const goToCreate = () => {
         navigation.navigate("CreatePage");
     };
-    const { isOpen, isModified, setIsModified } = useContext(AppContext);
+    const { isModified, setIsModified } = useContext(AppContext);
 
     const [placeData, setPlaceData] = useState([]);
 
@@ -86,8 +86,7 @@ export default function Home() {
 
     return (
         <>
-            {isOpen && <View style={styles.overlay} />}
-            <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+            <SafeAreaView style={{ flex: 1 }}>
                 <View
                     style={{
                         flexDirection: "row",
@@ -108,6 +107,12 @@ export default function Home() {
                             placeholder="Where you at?"
                             onChangeText={updateSearch1}
                             value={search1}
+                            searchIcon={{
+                                type: "font-awesome",
+                                name: "location-arrow",
+                                color: "gray",
+                                // width: 30,
+                            }}
                         />
                     </View>
                     <View style={[styles.rowView]}>
@@ -119,6 +124,12 @@ export default function Home() {
                             placeholder="Where to?"
                             onChangeText={updateSearch2}
                             value={search2}
+                            searchIcon={{
+                                type: "font-awesome",
+                                name: "flag",
+                                color: "gray",
+                                // width: 30,
+                            }}
                         />
                     </View>
                 </View>
@@ -139,6 +150,7 @@ const styles = StyleSheet.create({
     rowView: {
         width: Dimensions.get("window").width / 2,
         flexDirection: "row",
+        height: 85,
     },
     searchBarStyle: {
         flex: 1,
@@ -148,15 +160,15 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
-    overlay: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: 9999,
-    },
+    // overlay: {
+    //     position: "absolute",
+    //     top: 0,
+    //     left: 0,
+    //     right: 0,
+    //     bottom: 0,
+    //     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    //     zIndex: 9999,
+    // },
     bottomView: {
         height: 90,
         backgroundColor: "white",

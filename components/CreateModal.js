@@ -60,7 +60,7 @@ export default function CreateModal() {
                 style={[
                     styles.iconContainer,
                     {
-                        backgroundColor: item.selected ? "#feda6a" : "#d4d4dc",
+                        backgroundColor: item.selected ? "#a8bbd6" : "#d4d4dc",
                         borderWidth: 1,
                         borderColor: "black",
                     },
@@ -70,7 +70,7 @@ export default function CreateModal() {
                     type={item.type}
                     name={item.name}
                     size={50}
-                    color={item.selected ? "#e32f45" : "black"}
+                    color={item.selected ? "white" : "black"}
                 ></Icon>
             </TouchableOpacity>
         );
@@ -120,6 +120,9 @@ export default function CreateModal() {
             }}
             animationDuration={3}
             animationEasing={Easing.ease}
+            backdropComponent={({ style }) => (
+                <View style={[style, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]} />
+                )}
         >
             <BottomSheetView>
                 <View style={styles.container}>
@@ -133,6 +136,7 @@ export default function CreateModal() {
                         }}
                         leftIconContainerStyle={{ marginRight: 10 }}
                         placeholder="Enter current location..."
+                        inputStyle={{ color: "#d4d4dc" }}
                     ></Input>
                 </View>
                 <View style={styles.container}>
@@ -146,6 +150,7 @@ export default function CreateModal() {
                         }}
                         leftIconContainerStyle={{ marginRight: 10 }}
                         placeholder="Enter destination..."
+                        inputStyle={{ color: "#d4d4dc" }}
                     ></Input>
                 </View>
                 <View style={styles.selectStyle}>
@@ -154,7 +159,7 @@ export default function CreateModal() {
                             fontSize: 18,
                             marginBottom: 10,
                             color: "#d4d4dc",
-                            fontWeight: "600"
+                            fontWeight: "600",
                         }}
                     >
                         Select the transportations used to commute

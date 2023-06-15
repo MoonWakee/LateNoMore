@@ -18,7 +18,6 @@ import {
 import { Icon } from "@rneui/themed";
 import { useState, useContext, useRef, useEffect } from "react";
 
-
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -53,7 +52,7 @@ const customCreateButton = ({ children, onPress }) => (
                 height: 75,
                 borderRadius: 40,
                 backgroundColor: "white",
-                ...styles.shadow
+                ...styles.shadow,
             }}
         >
             {children}
@@ -95,12 +94,10 @@ function HomeStack() {
                     headerTitle: "Get Out",
                     headerTintColor: "white",
                     headerTitleStyle: {
-                      fontWeight: 700  
+                        fontWeight: 700,
                     },
                     headerStyle: {
-                        backgroundColor: isOpen
-                            ? "#545d6b"
-                            : "#a8bbd6",
+                        backgroundColor: "#a8bbd6",
                     },
                     tabBarIcon: ({ focused }) => (
                         <View
@@ -172,12 +169,10 @@ function HomeStack() {
                     headerTitle: "Alarms",
                     headerTintColor: "white",
                     headerTitleStyle: {
-                      fontWeight: 700  
+                        fontWeight: 700,
                     },
                     headerStyle: {
-                        backgroundColor: isOpen
-                            ? "#545d6b"
-                            : "#a8bbd6",
+                        backgroundColor: "#a8bbd6",
                     },
                     tabBarBadgeStyle: {
                         top: 8,
@@ -237,7 +232,7 @@ export default function Tabs() {
             <SafeAreaView
                 style={{
                     flex: 0,
-                    backgroundColor: isOpen ? '#545d6b' : "#a8bbd6",
+                    backgroundColor: isOpen ? "#545d6b" : "#a8bbd6",
                 }}
             />
             {/* <SafeAreaView style={styles.container}> */}
@@ -247,9 +242,7 @@ export default function Tabs() {
                         headerBackTitleVisible: false,
                         animation: "slide_from_right",
                         headerStyle: {
-                            backgroundColor: isOpen
-                                ? "rgba(0, 0, 0, 0.5)"
-                                : "white",
+                            backgroundColor: "white",
                         },
                         headerLeft: customHeaderBackButton,
                     }}
