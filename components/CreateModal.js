@@ -13,14 +13,12 @@ import { Icon, Input } from "@rneui/base";
 import { addItem, getItems } from "../Crud";
 import { useNavigation } from "@react-navigation/native";
 
-
 export default function CreateModal() {
     const sheetRef = useRef(null);
     const snapPoints = ["68%", "78%", "90%"];
     const { setIsOpen, setIsModified } = useContext(AppContext);
     const [input1, setInput1] = useState("");
     const [input2, setInput2] = useState("");
-
 
     const [keyboardStatus, setKeyboardStatus] = useState(false);
 
@@ -61,7 +59,11 @@ export default function CreateModal() {
                 onPress={() => handleTransportItemPress(item.id)}
                 style={[
                     styles.iconContainer,
-                    { backgroundColor: item.selected ? "black" : "white" },
+                    {
+                        backgroundColor: item.selected ? "#feda6a" : "#d4d4dc",
+                        borderWidth: 1,
+                        borderColor: "black",
+                    },
                 ]}
             >
                 <Icon
@@ -83,28 +85,40 @@ export default function CreateModal() {
     const closeAndNavigate = () => {
         setIsModified(true);
         sheetRef.current.close();
-        const filteredTransportData = transportData.filter(item => item.selected === true);
-        const transports = []
-        filteredTransportData.forEach(item => {
-            transports.push(item.id)
-        })
-        if (input1.trim() != "" && input2.trim() != "" && transports.length != 0) {
-            const id = addItem((start = input1), (end = input2), (data = transports));
-            goToPlacePage(id, start, end, data)
+        const filteredTransportData = transportData.filter(
+            (item) => item.selected === true
+        );
+        const transports = [];
+        filteredTransportData.forEach((item) => {
+            transports.push(item.id);
+        });
+        if (
+            input1.trim() != "" &&
+            input2.trim() != "" &&
+            transports.length != 0
+        ) {
+            const id = addItem(
+                (start = input1),
+                (end = input2),
+                (data = transports)
+            );
+            goToPlacePage(id, start, end, data);
+        }
     };
-}
 
     return (
         <BottomSheet
+            backgroundStyle={{ backgroundColor: "#1d1e22" }}
+            handleIndicatorStyle={{ backgroundColor: "#d4d4dc" }}
             ref={sheetRef}
             index={keyboardStatus ? 2 : 1}
             snapPoints={snapPoints}
             enablePanDownToClose={true}
             onClose={() => {
-                setIsOpen(false)
-                setIsModified(true)
+                setIsOpen(false);
+                setIsModified(true);
             }}
-            animationDuration={10}
+            animationDuration={3}
             animationEasing={Easing.ease}
         >
             <BottomSheetView>
@@ -115,6 +129,7 @@ export default function CreateModal() {
                         leftIcon={{
                             type: "font-awesome",
                             name: "location-arrow",
+                            color: "#d4d4dc",
                         }}
                         leftIconContainerStyle={{ marginRight: 10 }}
                         placeholder="Enter current location..."
@@ -124,13 +139,24 @@ export default function CreateModal() {
                     <Input
                         value={input2}
                         onChangeText={setInput2}
-                        leftIcon={{ type: "font-awesome", name: "flag" }}
+                        leftIcon={{
+                            type: "font-awesome",
+                            name: "flag",
+                            color: "#d4d4dc",
+                        }}
                         leftIconContainerStyle={{ marginRight: 10 }}
                         placeholder="Enter destination..."
                     ></Input>
                 </View>
                 <View style={styles.selectStyle}>
-                    <Text style={{ fontSize: 18, marginBottom: 10 }}>
+                    <Text
+                        style={{
+                            fontSize: 18,
+                            marginBottom: 10,
+                            color: "#d4d4dc",
+                            fontWeight: "600"
+                        }}
+                    >
                         Select the transportations used to commute
                     </Text>
                     <FlatList
@@ -145,7 +171,13 @@ export default function CreateModal() {
                     onPress={closeAndNavigate}
                     style={styles.saveStyle}
                 >
-                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                    <Text
+                        style={{
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: 18,
+                        }}
+                    >
                         Create
                     </Text>
                 </TouchableOpacity>
@@ -181,9 +213,9 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "rgba(111, 202, 186, 1)",
+        backgroundColor: "#cd5554",
         borderRadius: 12,
-        width: 120,
+        width: 200,
         height: 60,
     },
 });

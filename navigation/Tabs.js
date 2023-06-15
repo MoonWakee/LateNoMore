@@ -14,9 +14,12 @@ import {
     TouchableOpacity,
     View,
     SafeAreaView,
+    Animated,
 } from "react-native";
 import { Icon } from "@rneui/themed";
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
+import * as Animatable from "react-native-animatable";
+import { StatusBar } from "expo-status-bar";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -39,19 +42,20 @@ const customCreateButton = ({ children, onPress }) => (
     <TouchableOpacity
         style={{
             flex: 1,
-            top: -30,
+            top: 10,
+            alignSelf: "center",
             justifyContent: "center",
             alignItems: "center",
-            ...styles.shadow,
         }}
         onPress={onPress}
     >
         <View
             style={{
-                width: 90,
-                height: 90,
-                borderRadius: 45,
-                backgroundColor: "#e32f45",
+                width: 75,
+                height: 75,
+                borderRadius: 40,
+                backgroundColor: "white",
+                ...styles.shadow
             }}
         >
             {children}
@@ -71,12 +75,13 @@ function HomeStack() {
                     headerShown: false,
                     position: "absolute",
                     bottom: 0,
-                    marginLeft: 10,
-                    marginRight: 10,
+                    marginLeft: 0,
+                    marginRight: 0,
                     elevation: 0,
-                    borderRadius: 15,
-                    height: 90,
+                    borderRadius: 30,
+                    height: 95,
                     ...(!isOpen && styles.shadow),
+                    backgroundColor: "#a8bbd6",
                 },
             }}
         >
@@ -89,27 +94,54 @@ function HomeStack() {
                     },
                 })}
                 options={{
-                    headerTitle: "Get Out",
+                    headerTitle: "I love ddj, ddj loves me",
+                    headerTintColor: "white",
+                    headerTitleStyle: {
+                      fontWeight: 700  
+                    },
                     headerStyle: {
-                        backgroundColor: isOpen
-                            ? "rgba(0, 0, 0, 0.5)"
-                            : "white",
+                        // backgroundColor: isOpen
+                        //     ? "rgba(0, 0, 0, 0.5)"
+                        //     : "white",
+
+                        //new color
+                        backgroundColor: "#a8bbd6",
                     },
                     tabBarIcon: ({ focused }) => (
-                        <View style={styles.iconStyle}>
+                        <View
+                            style={[
+                                styles.iconStyle,
+                                {
+                                    backgroundColor: focused
+                                        ? "white"
+                                        : "#a8bbd6",
+                                },
+                            ]}
+                        >
                             <Icon
                                 name="home"
                                 type="ionicon"
-                                size={35}
-                                color={focused ? "#e32f45" : "#748c94"}
+                                size={30}
+                                color={focused ? "#cd5554" : "white"}
                             />
                             <Text
                                 style={{
-                                    color: focused ? "#e32f45" : "#748c94",
+                                    fontWeight: "600",
+                                    color: focused ? "#cd5554" : "white",
                                 }}
                             >
                                 Home
                             </Text>
+                            {focused && (
+                                <View
+                                    style={[
+                                        styles.bottomLine,
+                                        {
+                                            borderBottomColor: "#cd5554",
+                                        },
+                                    ]}
+                                />
+                            )}
                         </View>
                     ),
                 }}
@@ -129,9 +161,9 @@ function HomeStack() {
                             source={require("../resources/CreateButton.png")}
                             resizeMode="contain"
                             style={{
-                                width: 58,
-                                height: 58,
-                                tintColor: "white",
+                                width: 70,
+                                height: 70,
+                                tintColor: "#cd5554",
                             }}
                         />
                     ),
@@ -154,20 +186,40 @@ function HomeStack() {
                     },
                     tabBarBadge: 3,
                     tabBarIcon: ({ focused }) => (
-                        <View style={styles.iconStyle}>
+                        <View
+                            style={[
+                                styles.iconStyle,
+                                {
+                                    backgroundColor: focused
+                                        ? "white"
+                                        : "#a8bbd6",
+                                },
+                            ]}
+                        >
                             <Icon
-                                name="notifications-circle-outline"
+                                name="notifications"
                                 type="ionicon"
-                                size={40}
-                                color={focused ? "#e32f45" : "#748c94"}
+                                size={30}
+                                color={focused ? "#cd5554" : "white"}
                             />
                             <Text
                                 style={{
-                                    color: focused ? "#e32f45" : "#748c94",
+                                    fontWeight: "600",
+                                    color: focused ? "#cd5554" : "white",
                                 }}
                             >
                                 Alarms
                             </Text>
+                            {focused && (
+                                <View
+                                    style={[
+                                        styles.bottomLine,
+                                        {
+                                            borderBottomColor: "#cd5554",
+                                        },
+                                    ]}
+                                />
+                            )}
                         </View>
                     ),
                 }}
@@ -179,6 +231,16 @@ function HomeStack() {
 export default function Tabs() {
     const [isOpen, setIsOpen] = useState(false);
     const [isModified, setIsModified] = useState(true);
+    const colorAnimation = useRef(new Animated.Value(1)).current;
+
+    const startAnimation = () => {
+        Animated.timing(colorAnimation, {
+            toValue: 0,
+            duration: 1000,
+            useNativeDriver: false,
+        }).start();
+    };
+
     return (
         <AppContext.Provider
             value={{ isOpen, setIsOpen, isModified, setIsModified }}
@@ -186,61 +248,80 @@ export default function Tabs() {
             <SafeAreaView
                 style={{
                     flex: 0,
-                    backgroundColor: isOpen ? "rgba(0, 0, 0, 0.5)" : "white",
+                    backgroundColor: "#a8bbd6",
                 }}
             />
-            <SafeAreaView style={styles.container}>
-                <View style={styles.container}>
-                    <Stack.Navigator
-                        screenOptions={{
-                            headerBackTitleVisible: false,
-                            animation: "slide_from_right",
-                            headerStyle: {
-                                backgroundColor: isOpen
-                                    ? "rgba(0, 0, 0, 0.5)"
-                                    : "white",
-                            },
-                            headerLeft: customHeaderBackButton,
+            {/* <SafeAreaView style={styles.container}> */}
+            <View style={styles.container}>
+                <Stack.Navigator
+                    screenOptions={{
+                        headerBackTitleVisible: false,
+                        animation: "slide_from_right",
+                        headerStyle: {
+                            backgroundColor: isOpen
+                                ? "rgba(0, 0, 0, 0.5)"
+                                : "white",
+                        },
+                        headerLeft: customHeaderBackButton,
+                    }}
+                >
+                    <Stack.Screen
+                        name="Home"
+                        component={HomeStack}
+                        options={{
+                            headerLeft: false,
+                            headerShown: false,
                         }}
-                    >
-                        <Stack.Screen
-                            name="Home"
-                            component={HomeStack}
-                            options={{
-                                headerLeft: false,
-                                headerShown: false
-                            }}
-                        />
-                        <Stack.Screen name="PlacePage" component={PlacePage} />
-                    </Stack.Navigator>
+                    />
+                    <Stack.Screen name="PlacePage" component={PlacePage} />
+                </Stack.Navigator>
 
-                    {/* Create Modal Starts here! */}
+                {/* Create Modal Starts here! */}
 
-                    {isOpen && <CreateModal />}
-                </View>
-            </SafeAreaView>
+                {isOpen && <CreateModal />}
+            </View>
+            {/* </SafeAreaView> */}
         </AppContext.Provider>
     );
 }
 
 const styles = StyleSheet.create({
+    shadowButton: {
+        shadowColor: "gray",
+        shadowOffset: {
+            width: 1,
+            height: 5,
+        },
+        shadowOpacity: 0.35,
+        shadowRadius: 5,
+        elevation: 10,
+    },
+
     shadow: {
         shadowColor: "black",
         shadowOffset: {
             width: 0,
             height: 10,
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.5,
+        shadowOpacity: 0.35,
+        shadowRadius: 5,
         elevation: 5,
     },
     iconStyle: {
         alignItems: "center",
         justifyContent: "center",
-        top: 5,
+        top: 10,
+        padding: 8,
+        paddingHorizontal: 30,
+        borderRadius: 30,
     },
     container: {
         flex: 1,
-        backgroundColor: "white",
+    },
+    bottomLine: {
+        borderBottomWidth: 4,
+        width: 30,
+        marginTop: 3,
+        borderRadius: 100,
     },
 });

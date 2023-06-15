@@ -48,14 +48,13 @@ export default function Home() {
 
     const addPlaceData = (id, start, end, data) => {
         const hasDuplicate = placeData.some((p) => p.id === id);
-        if(hasDuplicate) {
+        if (hasDuplicate) {
             // console.log('Duplicate existing');
             return;
         } else {
             const newItem = { id: id, start: start, end: end, data: data };
             setPlaceData([placeData, ...newItem]);
         }
-
     };
 
     useEffect(() => {
@@ -64,20 +63,20 @@ export default function Home() {
 
     const fetchItems = async () => {
         try {
-          const items = await getItems();
-          //Reversing the item in items so that the newly created is shown on top
-          const newData = items.reverse().map((item) => ({
-            id: item.id,
-            start: item.start,
-            end: item.end,
-            data: item.data,
-          }));
-      
-          setPlaceData(newData);
+            const items = await getItems();
+            //Reversing the item in items so that the newly created is shown on top
+            const newData = items.reverse().map((item) => ({
+                id: item.id,
+                start: item.start,
+                end: item.end,
+                data: item.data,
+            }));
+
+            setPlaceData(newData);
         } catch (error) {
-          console.log(error);
+            console.log(error);
         }
-      };
+    };
 
     if (isModified) {
         fetchItems().then(() => setIsModified(false));
@@ -88,11 +87,22 @@ export default function Home() {
     return (
         <>
             {isOpen && <View style={styles.overlay} />}
-
-            <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-                <View style={{ flexDirection: "row" }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: "#F2BA93" }}>
+                <View
+                    style={{
+                        flexDirection: "row",
+                    }}
+                >
                     <View style={styles.rowView}>
                         <SearchBar
+                            containerStyle={{
+                                backgroundColor: "#a8bbd6",
+                            }}
+                            inputContainerStyle={{ backgroundColor: "white" }}
+                            // cancelButtonProps={{
+                            //     color: 'red',
+                            //     borderWidth: 1
+                            //   }}
                             style={styles.searchBarStyle}
                             platform={searchBarOS}
                             placeholder="Where you at?"
@@ -102,6 +112,8 @@ export default function Home() {
                     </View>
                     <View style={[styles.rowView]}>
                         <SearchBar
+                            containerStyle={{ backgroundColor: "#a8bbd6" }}
+                            inputContainerStyle={{ backgroundColor: "white" }}
                             style={styles.searchBarStyle}
                             platform={searchBarOS}
                             placeholder="Where to?"
@@ -110,12 +122,15 @@ export default function Home() {
                         />
                     </View>
                 </View>
+                <View style={styles.arc} />
                 <PlaceList
                     style={styles.folderView}
                     placeData={filteredPlaceData}
                 />
-                <View style={styles.bottomView} />
             </SafeAreaView>
+            {/* <View style={styles.revarc} /> */}
+
+            <View style={styles.bottomView} />
         </>
     );
 }
@@ -143,6 +158,20 @@ const styles = StyleSheet.create({
         zIndex: 9999,
     },
     bottomView: {
-        height: 90
+        height: 90,
+        backgroundColor: "#F2BA93",
+        // backgroundColor: "#a8bbd6",
+    },
+    arc: {
+        height: 30,
+        backgroundColor: "#a8bbd6",
+        borderBottomLeftRadius: 70,
+        borderBottomRightRadius: 70,
+    },
+    revarc: {
+        height: 30,
+        backgroundColor: "#a8bbd6",
+        borderTopLeftRadius: 70,
+        borderTopRightRadius: 70,
     },
 });
