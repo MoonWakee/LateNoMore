@@ -9,7 +9,7 @@ import {
     Dimensions,
 } from "react-native";
 import { SearchBar } from "@rneui/base";
-import PlaceList from "./PlaceList";
+import PlaceList from "./PlaceComponents/PlaceList";
 import { useNavigation } from "@react-navigation/native";
 import AppContext from "../navigation/AppContext";
 import { getItems } from "../Crud";
@@ -25,10 +25,6 @@ export default function Home() {
         setSearch2(search2);
     };
 
-    const navigation = useNavigation();
-    const goToCreate = () => {
-        navigation.navigate("CreatePage");
-    };
     const { isModified, setIsModified } = useContext(AppContext);
 
     const [placeData, setPlaceData] = useState([]);
@@ -45,17 +41,6 @@ export default function Home() {
             return placeData;
         }
     }, [placeData, search1, search2]);
-
-    const addPlaceData = (id, start, end, data) => {
-        const hasDuplicate = placeData.some((p) => p.id === id);
-        if (hasDuplicate) {
-            // console.log('Duplicate existing');
-            return;
-        } else {
-            const newItem = { id: id, start: start, end: end, data: data };
-            setPlaceData([placeData, ...newItem]);
-        }
-    };
 
     useEffect(() => {
         fetchItems();

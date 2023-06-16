@@ -2,7 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "../components/Home";
 import Alarms from "../components/Alarms";
-import PlacePage from "../components/PlacePage";
+import PlacePage from "../components/PlaceComponents/PlacePage";
 import DummyPage from "../components/DummyPage";
 import CreateModal from "../components/CreateModal";
 import AppContext from "./AppContext";
@@ -30,7 +30,7 @@ const customHeaderBackButton = ({ onPress }) => {
     };
     return (
         <TouchableOpacity onPress={handlePress} style={{ marginLeft: 24 }}>
-            <Icon name="arrow-back" size={24} />
+            <Icon type='ionicon' name="arrow-back-circle" size={35} color='white'/>
         </TouchableOpacity>
     );
 };
@@ -114,12 +114,12 @@ function HomeStack() {
                                 name="home"
                                 type="ionicon"
                                 size={30}
-                                color={focused ? "#cd5554" : "white"}
+                                color={focused ? "white" : "#e6e6e6"}
                             />
                             <Text
                                 style={{
                                     fontWeight: "600",
-                                    color: focused ? "#cd5554" : "white",
+                                    color: focused ? "white" : "#e6e6e6",
                                 }}
                             >
                                 Home
@@ -193,12 +193,12 @@ function HomeStack() {
                                 name="notifications"
                                 type="ionicon"
                                 size={30}
-                                color={focused ? "#cd5554" : "white"}
+                                color={focused ? "white" : "#e6e6e6"}
                             />
                             <Text
                                 style={{
                                     fontWeight: "600",
-                                    color: focused ? "#cd5554" : "white",
+                                    color: focused ? "white" : "#e6e6e6",
                                 }}
                             >
                                 Alarms
@@ -242,9 +242,10 @@ export default function Tabs() {
                         headerBackTitleVisible: false,
                         animation: "slide_from_right",
                         headerStyle: {
-                            backgroundColor: "white",
+                            backgroundColor: "#a8bbd6",
                         },
                         headerLeft: customHeaderBackButton,
+                        
                     }}
                 >
                     <Stack.Screen
@@ -255,7 +256,7 @@ export default function Tabs() {
                             headerShown: false,
                         }}
                     />
-                    <Stack.Screen name="PlacePage" component={PlacePage} />
+                    <Stack.Screen name="PlacePage" component={PlacePage} options={{headerBackTitleStyle: false, headerTitle: ''}}/>
                 </Stack.Navigator>
 
                 {/* Create Modal Starts here! */}

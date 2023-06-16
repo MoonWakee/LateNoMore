@@ -1,19 +1,55 @@
 import { StyleSheet, Text, View, Dimensions } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import AppContext from "../navigation/AppContext";
 import { SearchBar } from "@rneui/base";
+import PlaceList from "./PlaceComponents/PlaceList";
+import { getItems } from "../Crud";
+
 
 export default function Alarms() {
     const searchBarOS = Platform.OS === "ios" ? "ios" : "Android";
+    const { isModified, setIsModified } = useContext(AppContext);
+
     const [search, setSearch] = useState("")
+    const [placeData, setPlaceData] = useState([]);
+
     const updateSearch = (search) => {
         setSearch(search);
     };
+    useEffect(() => {
+        fetchItems();
+    }, []);
+
+    const fetchItems = async () => {
+        try {
+            const items = await getItems();
+            //Reversing the item in items so that the newly created is shown on top
+            const newData = items.reverse().map((item) => ({
+                id: item.id,
+                start: item.start,
+                end: item.end,
+                data: item.data,
+            }));
+
+            setPlaceData(newData);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    if (isModified) {
+        fetchItems().then(() => setIsModified(false));
+    }
+
+    console.log(placeData)
 
     return (
         <View style={styles.container}>                
             <View style={styles.arc} />
-            <Text>Alarms</Text>
+            <PlaceList
+                    style={styles.folderView}
+                    placeData={placeData}
+                />
         </View>
     );
 }
@@ -45,5 +81,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#a8bbd6",
         borderBottomLeftRadius: 100,
         borderBottomRightRadius: 100,
+    },
+    folderView: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
     },
 });

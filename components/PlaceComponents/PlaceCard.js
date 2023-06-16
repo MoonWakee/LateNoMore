@@ -30,8 +30,6 @@ export default function PlaceCard({ id, start, end, data }) {
         iconSettler(data);
     }, [data]);
 
-    console.log(arr);
-
     const containerChanger = (len) => {
         if (len <= 2) {
             return {
@@ -225,9 +223,7 @@ export default function PlaceCard({ id, start, end, data }) {
                                     style={{
                                         fontSize: 18,
                                         fontWeight: "bold",
-                                        color: "gray",
-                                        numberOfLines: 1,
-                                        ellipsizeMode: "tail",
+                                        color: "gray"
                                     }}
                                 >
                                     {end.length < 27
