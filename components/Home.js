@@ -12,7 +12,7 @@ import { SearchBar } from "@rneui/base";
 import PlaceList from "./PlaceComponents/PlaceList";
 import { useNavigation } from "@react-navigation/native";
 import AppContext from "../navigation/AppContext";
-import { getItems } from "../Crud";
+import { getPlaceItems } from "../Crud";
 
 export default function Home() {
     const searchBarOS = Platform.OS === "ios" ? "ios" : "Android";
@@ -48,7 +48,7 @@ export default function Home() {
 
     const fetchItems = async () => {
         try {
-            const items = await getItems();
+            const items = await getPlaceItems();
             //Reversing the item in items so that the newly created is shown on top
             const newData = items.reverse().map((item) => ({
                 id: item.id,

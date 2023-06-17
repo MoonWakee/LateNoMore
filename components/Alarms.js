@@ -3,7 +3,7 @@ import React, { useContext, useState, useEffect } from "react";
 import AppContext from "../navigation/AppContext";
 import { SearchBar } from "@rneui/base";
 import PlaceList from "./PlaceComponents/PlaceList";
-import { getItems } from "../Crud";
+import { getPlaceItems } from "../Crud";
 
 
 export default function Alarms() {
@@ -22,7 +22,7 @@ export default function Alarms() {
 
     const fetchItems = async () => {
         try {
-            const items = await getItems();
+            const items = await getPlaceItems();
             //Reversing the item in items so that the newly created is shown on top
             const newData = items.reverse().map((item) => ({
                 id: item.id,
@@ -41,7 +41,6 @@ export default function Alarms() {
         fetchItems().then(() => setIsModified(false));
     }
 
-    console.log(placeData)
 
     return (
         <View style={styles.container}>                

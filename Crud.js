@@ -5,17 +5,69 @@ const db = SQLite.openDatabase("test.db");
 export const initializeDatabase = () => {
     db.transaction((tx) => {
         tx.executeSql(
-            "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, start TEXT, end TEXT, count INT, data JSON)"
+            "CREATE TABLE IF NOT EXISTS place_items (id INTEGER PRIMARY KEY AUTOINCREMENT, start TEXT, end TEXT, count INT, data JSON)"
             // "DROP TABLE IF EXISTS items"
         );
-        // console.log("deleted table");
+        tx.executeSql(
+            "CREATE TABLE IF NOT EXISTS timer_items (id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, date TEXT, time TEXT)"
+            // "DROP TABLE IF EXISTS timer_items"
+        );
+        tx.executeSql(
+            "CREATE TABLE IF NOT EXISTS alarm_items (id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, time INT)"
+            // "DROP TABLE IF EXISTS alarm_items"
+        );
     });
 };
 
-export const addItem = (start, end, data) => {
+export const addTimerItem = (place_id, date, time) => {
     db.transaction((tx) => {
         tx.executeSql(
-            "SELECT * FROM items WHERE start = ? AND end = ? AND data = ?",
+            "INSERT INTO timer_items (place_id, date, time) VALUES (?, ?, ?)",
+            [place_id, date, time],
+            (_, result) => {
+                // Handle success
+                const lastInsertId = result.insertId;
+                console.log(
+                    "Timer item added with ID:",
+                    lastInsertId,
+                    place_id,
+                    date,
+                    time
+                );
+                return lastInsertId;
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error adding timer item:", error);
+            }
+        )
+    })
+}
+
+export const getTimerItems = (place_id) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "SELECT * FROM timer_items WHERE place_id = ?",
+                [place_id],
+                (_, result) => {
+                    // Handle success
+                    const items = result.rows._array;
+                    resolve(items);
+                },
+                (_, error) => {
+                    // Handle error
+                    reject(error);
+                }
+            );
+        });
+    });
+};
+
+export const addPlaceItem = (start, end, data) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "SELECT * FROM place_items WHERE start = ? AND end = ? AND data = ?",
             [start, end, data],
             (_, result) => {
                 const existingItem = result.rows._array[0];
@@ -26,13 +78,13 @@ export const addItem = (start, end, data) => {
                     // Item does not exist, insert it into the database
                     db.transaction((tx) => {
                         tx.executeSql(
-                            "INSERT INTO items (start, end, count, data) VALUES (?, ?, 0, ?)",
+                            "INSERT INTO place_items (start, end, count, data) VALUES (?, ?, 0, ?)",
                             [start, end, data],
                             (_, result) => {
                                 // Handle success
                                 const lastInsertId = result.insertId;
                                 console.log(
-                                    "Item added with ID:",
+                                    "Place item added with ID:",
                                     lastInsertId,
                                     start,
                                     end,
@@ -42,7 +94,7 @@ export const addItem = (start, end, data) => {
                             },
                             (_, error) => {
                                 // Handle error
-                                console.log("Error adding item:", error);
+                                console.log("Error adding place item:", error);
                             }
                         );
                     });
@@ -56,11 +108,11 @@ export const addItem = (start, end, data) => {
     });
 };
 
-export const getItems = () => {
+export const getPlaceItems = () => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
             tx.executeSql(
-                "SELECT * FROM items",
+                "SELECT * FROM place_items",
                 [],
                 (_, result) => {
                     // Handle success
@@ -75,6 +127,27 @@ export const getItems = () => {
         });
     });
 };
+
+export const checkIfPlaceItemExists = (start, end, data) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT * FROM place_items WHERE start = ? AND end = ? AND data = ?",
+          [start, end, data],
+          (_, result) => {
+            // Handle success
+            const items = result.rows._array;
+            resolve(items.length > 0); // Resolve with true if items exist, false otherwise
+          },
+          (_, error) => {
+            // Handle error
+            reject(error);
+          }
+        );
+      });
+    });
+  };
+  
 
 
 export const updateItem = (id, text, count) => {

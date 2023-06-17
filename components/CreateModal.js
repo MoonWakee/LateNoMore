@@ -4,13 +4,14 @@ import {
     Text,
     TouchableOpacity,
     View,
+    Alert,
 } from "react-native";
 import React, { useRef, useContext, useState, useEffect } from "react";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Easing, Keyboard } from "react-native";
 import AppContext from "../navigation/AppContext";
 import { Icon, Input } from "@rneui/base";
-import { addItem, getItems } from "../Crud";
+import { addPlaceItem, getPlaceItems, checkIfPlaceItemExists } from "../Crud";
 import { useNavigation } from "@react-navigation/native";
 
 export default function CreateModal() {
@@ -60,9 +61,9 @@ export default function CreateModal() {
                 style={[
                     styles.iconContainer,
                     {
-                        backgroundColor: item.selected ? "#a8bbd6" : "#d4d4dc",
+                        backgroundColor: item.selected ? "#F2BA93" : "#e6e6e6",
                         borderWidth: 1,
-                        borderColor: "black",
+                        borderColor: "white",
                     },
                 ]}
             >
@@ -82,9 +83,7 @@ export default function CreateModal() {
         navigation.navigate("PlacePage", { id, start, end, data });
     };
 
-    const closeAndNavigate = () => {
-        setIsModified(true);
-        sheetRef.current.close();
+    const checkInputs = () => {
         const filteredTransportData = transportData.filter(
             (item) => item.selected === true
         );
@@ -92,24 +91,36 @@ export default function CreateModal() {
         filteredTransportData.forEach((item) => {
             transports.push(item.id);
         });
-        if (
-            input1.trim() != "" &&
-            input2.trim() != "" &&
-            transports.length != 0
-        ) {
-            const id = addItem(
-                (start = input1),
-                (end = input2),
-                (data = transports)
-            );
-            goToPlacePage(id, start, end, data);
+
+        if (input1.trim() == "" && input2.trim() == "") {
+            Alert.alert("", "Enter Location and Destination!");
+        } else if (transports.length == 0) {
+            Alert.alert("", "Select at least one transportation!");
+        } else {
+            if (checkIfPlaceItemExists((start = input1), (end = input2), (data = transports)).then((exists) => {
+                if (exists){
+                    Alert.alert("", "Itinerary already exists!");
+                }else {
+                    closeAndNavigate(transports);
+                }
+            }));
         }
+    };
+    const closeAndNavigate = (transports) => {
+        setIsModified(true);
+        sheetRef.current.close();
+        const id = addPlaceItem(
+            (start = input1),
+            (end = input2),
+            (data = transports)
+        );
+        goToPlacePage(id, start, end, data);
     };
 
     return (
         <BottomSheet
-            backgroundStyle={{ backgroundColor: "#1d1e22" }}
-            handleIndicatorStyle={{ backgroundColor: "#d4d4dc" }}
+            backgroundStyle={{ backgroundColor: "#7E8CA1" }}
+            handleIndicatorStyle={{ backgroundColor: "white" }}
             ref={sheetRef}
             index={keyboardStatus ? 2 : 1}
             snapPoints={snapPoints}
@@ -121,8 +132,10 @@ export default function CreateModal() {
             animationDuration={3}
             animationEasing={Easing.ease}
             backdropComponent={({ style }) => (
-                <View style={[style, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]} />
-                )}
+                <View
+                    style={[style, { backgroundColor: "rgba(0, 0, 0, 0.5)" }]}
+                />
+            )}
         >
             <BottomSheetView>
                 <View style={styles.container}>
@@ -132,11 +145,12 @@ export default function CreateModal() {
                         leftIcon={{
                             type: "font-awesome",
                             name: "location-arrow",
-                            color: "#d4d4dc",
+                            color: "white",
                         }}
                         leftIconContainerStyle={{ marginRight: 10 }}
                         placeholder="Enter current location..."
-                        inputStyle={{ color: "#d4d4dc" }}
+                        placeholderTextColor={"white"}
+                        inputStyle={{ color: "white" }}
                     ></Input>
                 </View>
                 <View style={styles.container}>
@@ -146,11 +160,12 @@ export default function CreateModal() {
                         leftIcon={{
                             type: "font-awesome",
                             name: "flag",
-                            color: "#d4d4dc",
+                            color: "white",
                         }}
                         leftIconContainerStyle={{ marginRight: 10 }}
                         placeholder="Enter destination..."
-                        inputStyle={{ color: "#d4d4dc" }}
+                        inputStyle={{ color: "white" }}
+                        placeholderTextColor={"white"}
                     ></Input>
                 </View>
                 <View style={styles.selectStyle}>
@@ -158,7 +173,7 @@ export default function CreateModal() {
                         style={{
                             fontSize: 18,
                             marginBottom: 10,
-                            color: "#d4d4dc",
+                            color: "white",
                             fontWeight: "600",
                         }}
                     >
@@ -173,7 +188,7 @@ export default function CreateModal() {
                     />
                 </View>
                 <TouchableOpacity
-                    onPress={closeAndNavigate}
+                    onPress={checkInputs}
                     style={styles.saveStyle}
                 >
                     <Text
