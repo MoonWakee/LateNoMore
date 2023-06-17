@@ -4,16 +4,21 @@ import {
     View,
     Dimensions,
     TouchableWithoutFeedback,
+    Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Input } from "@rneui/base";
 import DashedLine from "react-native-dashed-line";
+import {deletePlaceItem} from "../../Crud.js"
 
 export default function PlaceCard({ id, start, end, data }) {
     const navigation = useNavigation();
     const goToPlacePage = () => {
         navigation.navigate("PlacePage", { id, start, end, data });
+        setTimeout(() => {
+            setIsPressed(false);
+        }, 1000);
     };
 
     const [arr, setArr] = useState([]);
@@ -175,9 +180,51 @@ export default function PlaceCard({ id, start, end, data }) {
         );
     };
 
+    const [isPressed, setIsPressed] = useState(false);
+
+    const handlePressIn = () => {
+        setIsPressed(true);
+    };
+
+    const handlePressOut = () => {
+        setIsPressed(false);
+    };
+
     return (
-        <TouchableWithoutFeedback onPress={goToPlacePage}>
-            <View style={styles.container}>
+        <TouchableWithoutFeedback
+            onPress={() => {
+                handlePressIn();
+                goToPlacePage();
+            }}
+            onLongPress={() => {
+                handlePressIn();
+                Alert.alert(
+                    "Do you want to delete?",
+                    `From: ${start} \nTo: ${end}`,
+                    [
+                        {
+                            text: "Cancel",
+                            style: "cancel",
+                            fontSize: 30
+                        },
+                        {
+                            text: "Delete",
+                            onPress: () => {
+                                deletePlaceItem(id)
+                            },
+                            style: "destructive",
+                        },
+                    ]
+                );
+            }}
+            onPressOut={handlePressOut}
+        >
+            <View
+                style={[
+                    styles.container,
+                    { backgroundColor: isPressed ? "#e6e6e6" : "white" },
+                ]}
+            >
                 <View style={styles.row}>
                     <View style={styles.leftTrans}>
                         <View style={styles.row}>
@@ -223,7 +270,7 @@ export default function PlaceCard({ id, start, end, data }) {
                                     style={{
                                         fontSize: 18,
                                         fontWeight: "bold",
-                                        color: "gray"
+                                        color: "gray",
                                     }}
                                 >
                                     {end.length < 27
@@ -243,7 +290,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // backgroundColor: "#A7BAD3",
-        backgroundColor: "white",
+        // backgroundColor: "white",
         borderRadius: 15,
         justifyContent: "center",
         // borderColor: "#dd602d",

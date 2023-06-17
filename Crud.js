@@ -184,6 +184,47 @@ export const deleteTimerItem = (id) => {
     });
 };
 
+export const deletePlaceItem = (id) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "DELETE FROM alerm_items WHERE place_id = ?",
+            [id],
+            (_, result) => {
+                // Handle success
+                console.log("Alerm Item deleted successfully from deletePlaceItem");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error deleting item:", error);
+            }
+        );
+        tx.executeSql(
+            "DELETE FROM timer_items WHERE place_id = ?",
+            [id],
+            (_, result) => {
+                // Handle success
+                console.log("Timer Item deleted successfully from deletePlaceItem");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error deleting Timer item:", error);
+            }
+        );
+        tx.executeSql(
+            "DELETE FROM place_items WHERE id = ?",
+            [id],
+            (_, result) => {
+                // Handle success
+                console.log("Place Item deleted successfully from deletePlaceItem");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error deleting Place item:", error);
+            }
+        );
+    });
+};
+
 export const deleteItem = (id) => {
     db.transaction((tx) => {
         tx.executeSql(

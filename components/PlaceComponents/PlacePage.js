@@ -42,6 +42,30 @@ export default function PlacePage({ route }) {
     const [minute, setMinute] = useState(0);
     const [date, setDate] = useState(new Date());
     const [isTimer, setIsTimer] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
+
+    const animationValue = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (isDelete) {
+            Animated.timing(animationValue, {
+                toValue: 1,
+                duration: 200,
+                useNativeDriver: false,
+            }).start();
+        } else {
+            Animated.timing(animationValue, {
+                toValue: 0,
+                duration: 200,
+                useNativeDriver: false,
+            }).start();
+        }
+    }, [isDelete, animationValue]);
+
+    const interpolateTextAlignment = animationValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 100],
+    });
 
     const [hours, setHours] = useState(0);
     const [minutes, setMinutes] = useState(0);
@@ -49,6 +73,7 @@ export default function PlacePage({ route }) {
     const [isRunning, setIsRunning] = useState(false);
     const [isFirst, setIsFirst] = useState(false);
     const [timerData, setTimerData] = useState([]);
+    const [rowKey, setRowKey] = useState(0)
     const runningRef = useRef(null);
 
     const { isOpen } = useContext(AppContext);
@@ -110,6 +135,8 @@ export default function PlacePage({ route }) {
         setHours(0);
         setMinutes(0);
         setSeconds(0);
+        setIsFirst(false);
+        setIsRunning(false);
     };
 
     useEffect(() => {
@@ -121,10 +148,6 @@ export default function PlacePage({ route }) {
     useEffect(() => {
         fetchItems();
     }, []);
-
-    useEffect(() => {
-        console.log(timerData);
-    }, [timerData]);
 
     const TimerItem = ({ item }) => {
         let time = parseInt(item.time);
@@ -237,7 +260,7 @@ export default function PlacePage({ route }) {
 
     const HiddenItem = () => {
         return (
-            <View
+            <Animated.View
                 style={{
                     flex: 1,
                     marginHorizontal: 10,
@@ -245,7 +268,8 @@ export default function PlacePage({ route }) {
                     height: 70,
                     borderRadius: 10,
                     justifyContent: "center",
-                    alignItems: "flex-end",
+                    alignItems: 'flex-end',
+                    interpolateTextAlignment,
                     paddingHorizontal: 16,
                     backgroundColor: "#FF0000",
                 }}
@@ -255,14 +279,14 @@ export default function PlacePage({ route }) {
                 >
                     Delete
                 </Text>
-            </View>
+            </Animated.View>
         );
     };
 
     const handleSwipeValueChange = (swipeData, swipeRow) => {
         const { key, value } = swipeData;
         if (value < -Dimensions.get("window").width) {
-            console.log(swipeRow);
+            setIsDelete(!isDelete);
             deleteTimerItem(key);
             fetchItems();
         }
@@ -277,6 +301,8 @@ export default function PlacePage({ route }) {
                 time: item.time,
             }));
             setTimerData(newData);
+            setRowKey(parseInt(newData[0]['timer_id']))
+
         } catch (error) {
             console.log(error);
         }
@@ -578,8 +604,9 @@ export default function PlacePage({ route }) {
                             renderItem={TimerItem}
                             renderHiddenItem={HiddenItem}
                             rightOpenValue={-Dimensions.get("window").width}
-                            previewOpenValue={-40}
-                            previewOpenDelay={3000}
+                            // previewOpenValue={-30}
+                            // previewOpenDelay={1000}
+                            // previewRowKey={rowKey}
                             onSwipeValueChange={handleSwipeValueChange}
                             useNativeDriver={false}
                             keyExtractor={(item) => item.timer_id}
