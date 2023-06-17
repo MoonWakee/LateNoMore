@@ -167,6 +167,23 @@ export const updateItem = (id, text, count) => {
     });
 };
 
+export const deleteTimerItem = (id) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "DELETE FROM timer_items WHERE id = ?",
+            [id],
+            (_, result) => {
+                // Handle success
+                console.log("Item deleted successfully");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error deleting item:", error);
+            }
+        );
+    });
+};
+
 export const deleteItem = (id) => {
     db.transaction((tx) => {
         tx.executeSql(

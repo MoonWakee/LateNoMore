@@ -1,11 +1,19 @@
 import React, { useEffect, useContext, useState, useRef } from "react";
-import { StyleSheet, Text, View, Animated, FlatList } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    Animated,
+    FlatList,
+    Dimensions,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AppContext from "../../navigation/AppContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button, Icon } from "@rneui/base";
 import SwitchSelector from "react-native-switch-selector";
-import { addTimerItem, getTimerItems } from "../../Crud";
+import { addTimerItem, getTimerItems, deleteTimerItem } from "../../Crud";
+import { SwipeListView } from "react-native-swipe-list-view";
 
 export default function PlacePage({ route }) {
     const { id, start, end, data } = route.params;
@@ -89,9 +97,6 @@ export default function PlacePage({ route }) {
     const handleStop = () => {
         clearInterval(runningRef.current);
         runningRef.current = null;
-        setHours(0);
-        setMinutes(0);
-        setSeconds(0);
     };
 
     const handleSave = () => {
@@ -102,6 +107,9 @@ export default function PlacePage({ route }) {
         if (seconds) total_time += seconds;
         addTimerItem(id, dateUse, parseInt(total_time));
         fetchItems();
+        setHours(0);
+        setMinutes(0);
+        setSeconds(0);
     };
 
     useEffect(() => {
@@ -135,7 +143,7 @@ export default function PlacePage({ route }) {
         second = time;
         console.log(hour, minute, time);
         return (
-            <View
+            <Animated.View
                 style={{
                     flex: 1,
                     backgroundColor: "#f6f8fb",
@@ -223,24 +231,42 @@ export default function PlacePage({ route }) {
                         </View>
                     </View>
                 </View>
+            </Animated.View>
+        );
+    };
+
+    const HiddenItem = () => {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    marginHorizontal: 10,
+                    marginVertical: 5,
+                    height: 70,
+                    borderRadius: 10,
+                    justifyContent: "center",
+                    alignItems: "flex-end",
+                    paddingHorizontal: 16,
+                    backgroundColor: "#FF0000",
+                }}
+            >
+                <Text
+                    style={{ fontSize: 18, color: "white", fontWeight: "bold" }}
+                >
+                    Delete
+                </Text>
             </View>
         );
     };
 
-    const dummyData = [
-        {
-            id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-            title: "First Item",
-        },
-        {
-            id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-            title: "Second Item",
-        },
-        {
-            id: "58694a0f-3da1-471f-bd96-145571e29d72",
-            title: "Third Item",
-        },
-    ];
+    const handleSwipeValueChange = (swipeData, swipeRow) => {
+        const { key, value } = swipeData;
+        if (value < -Dimensions.get("window").width) {
+            console.log(swipeRow);
+            deleteTimerItem(key);
+            fetchItems();
+        }
+    };
 
     const fetchItems = async () => {
         try {
@@ -540,11 +566,23 @@ export default function PlacePage({ route }) {
                 </View>
                 {isTimer && (
                     <View style={{ flex: 1, marginTop: 30 }}>
-                        <FlatList
+                        {/* <FlatList
                             data={timerData}
                             renderItem={TimerItem}
                             numColumns={1}
                             keyExtractor={(TimerItem) => TimerItem.id}
+                        /> */}
+                        <SwipeListView
+                            data={timerData}
+                            disableRightSwipe
+                            renderItem={TimerItem}
+                            renderHiddenItem={HiddenItem}
+                            rightOpenValue={-Dimensions.get("window").width}
+                            previewOpenValue={-40}
+                            previewOpenDelay={3000}
+                            onSwipeValueChange={handleSwipeValueChange}
+                            useNativeDriver={false}
+                            keyExtractor={(item) => item.timer_id}
                         />
                     </View>
                 )}
