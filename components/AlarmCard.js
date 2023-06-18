@@ -8,10 +8,11 @@ import {
     ActivityIndicator,
     Switch,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useContext} from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Input } from "@rneui/base";
-import { deletePlaceItem, getPlaceItem } from "../Crud.js";
+import { deletePlaceItem, getPlaceItem, deleteAlarmItem } from "../Crud.js";
+import AppContext from "../navigation/AppContext.js";
 
 export default function AlarmCard({ id, place_id, hour, minute }) {
     const [start, setStart] = useState("");
@@ -222,6 +223,9 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
         setIsPressed(false);
     };
 
+    const { isModified, setIsModified } = useContext(AppContext);
+
+
     return (
         // <></>
         <View>
@@ -231,25 +235,22 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
                 </View>
             ) : (
                 <TouchableWithoutFeedback
-                    onPress={() => {
-                        handlePressIn();
-                        // goToPlacePage();
-                    }}
                     onLongPress={() => {
                         handlePressIn();
                         Alert.alert(
-                            "Do you want to delete?",
-                            `From: ${start} \nTo: ${end}`,
+                            "Delete Alarm?", 
+                            '',
                             [
                                 {
-                                    text: "Cancel",
+                                    text: "No",
                                     style: "cancel",
                                     fontSize: 30,
                                 },
                                 {
-                                    text: "Delete",
+                                    text: "Yes",
                                     onPress: () => {
-                                        deletePlaceItem(id);
+                                        deleteAlarmItem(id);
+                                        setIsModified(true)
                                     },
                                     style: "destructive",
                                 },
@@ -307,7 +308,7 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
                                             flex: 1,
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            marginLeft: 30
+                                            marginLeft: 40
                                         }}
                                     >
                                         <Switch

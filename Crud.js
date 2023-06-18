@@ -288,6 +288,25 @@ export const deletePlaceItem = (id) => {
     });
 };
 
+
+
+export const deleteAlarmItem = (id) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "DELETE FROM alarm_items WHERE id = ?",
+            [id],
+            (_, result) => {
+                // Handle success
+                console.log("Alarm Item deleted successfully");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error deleting Timer item:", error);
+            }
+        );
+    });
+};
+
 export const deleteItem = (id) => {
     db.transaction((tx) => {
         tx.executeSql(

@@ -6,11 +6,13 @@ import {
     TouchableWithoutFeedback,
     Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Input } from "@rneui/base";
 import DashedLine from "react-native-dashed-line";
 import {deletePlaceItem} from "../../Crud.js"
+import AppContext from "../../navigation/AppContext.js";
+
 
 export default function PlaceCard({ id, start, end, data }) {
     const navigation = useNavigation();
@@ -21,6 +23,7 @@ export default function PlaceCard({ id, start, end, data }) {
         }, 1000);
     };
 
+    const { isModified, setIsModified } = useContext(AppContext);
     const [arr, setArr] = useState([]);
 
     const iconSettler = (data) => {
@@ -211,6 +214,8 @@ export default function PlaceCard({ id, start, end, data }) {
                             text: "Delete",
                             onPress: () => {
                                 deletePlaceItem(id)
+                                setIsModified(true)
+                                
                             },
                             style: "destructive",
                         },
