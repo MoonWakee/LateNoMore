@@ -1,37 +1,30 @@
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Dimensions, FlatList } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
 import AppContext from "../navigation/AppContext";
-import { SearchBar } from "@rneui/base";
-import PlaceList from "./PlaceComponents/PlaceList";
-import { getPlaceItems } from "../Crud";
-
+import { getAlarmItems } from "../Crud";
+import AlarmCard from "./AlarmCard";
 
 export default function Alarms() {
-    const searchBarOS = Platform.OS === "ios" ? "ios" : "Android";
     const { isModified, setIsModified } = useContext(AppContext);
 
-    const [search, setSearch] = useState("")
-    const [placeData, setPlaceData] = useState([]);
+    const [alarmData, setAlarmData] = useState([]);
 
-    const updateSearch = (search) => {
-        setSearch(search);
-    };
     useEffect(() => {
         fetchItems();
+        console.log(alarmData);
     }, []);
 
     const fetchItems = async () => {
         try {
-            const items = await getPlaceItems();
-            //Reversing the item in items so that the newly created is shown on top
+            const items = await getAlarmItems();
             const newData = items.reverse().map((item) => ({
                 id: item.id,
-                start: item.start,
-                end: item.end,
-                data: item.data,
+                place_id: item.place_id,
+                hour: item.hour,
+                minute: item.minute,
             }));
-
-            setPlaceData(newData);
+            console.log(newData);
+            setAlarmData(newData);
         } catch (error) {
             console.log(error);
         }
@@ -41,14 +34,21 @@ export default function Alarms() {
         fetchItems().then(() => setIsModified(false));
     }
 
+    const alarmItem = ({ item }) => {
+        return (
+            <AlarmCard
+                id={item.id}
+                place_id={item.place_id}
+                hour={item.hour}
+                minute={item.minute}
+            />
+        );
+    };
 
     return (
-        <View style={styles.container}>                
+        <View style={styles.container}>
             <View style={styles.arc} />
-            <PlaceList
-                    style={styles.folderView}
-                    placeData={placeData}
-                />
+            <FlatList data={alarmData} renderItem={alarmItem} numColumns={1} />
         </View>
     );
 }
@@ -60,21 +60,12 @@ const styles = StyleSheet.create({
     },
     rowView: {
         flexDirection: "row",
-        backgroundColor: '#a8bbd6',
+        backgroundColor: "#a8bbd6",
         height: 85,
     },
     searchBarStyle: {
         flex: 1,
     },
-    // overlay: {
-    //     position: "absolute",
-    //     top: 0,
-    //     left: 0,
-    //     right: 0,
-    //     bottom: 0,
-    //     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    //     zIndex: 9999,
-    // },
     arc: {
         height: 60,
         backgroundColor: "#a8bbd6",

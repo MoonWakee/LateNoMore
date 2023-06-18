@@ -12,12 +12,16 @@ import AppContext from "../../navigation/AppContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button, Icon } from "@rneui/base";
 import SwitchSelector from "react-native-switch-selector";
-import { addTimerItem, getTimerItems, deleteTimerItem } from "../../Crud";
+import {
+    addTimerItem,
+    getTimerItems,
+    deleteTimerItem,
+    addAlarmItem,
+} from "../../Crud";
 import { SwipeListView } from "react-native-swipe-list-view";
 
 export default function PlacePage({ route }) {
     const { id, start, end, data } = route.params;
-
     const createArray = (i, num) => {
         const arr = [];
         for (; i <= num; i++) {
@@ -38,10 +42,10 @@ export default function PlacePage({ route }) {
 
     const navigation = useNavigation();
 
-    const [hour, setHour] = useState(0);
-    const [minute, setMinute] = useState(0);
+    let [hour, setHour] = useState(new Date().getHours());
+    let [minute, setMinute] = useState(new Date().getMinutes());
     const [date, setDate] = useState(new Date());
-    const [isTimer, setIsTimer] = useState(false);
+    const [isTimer, setIsTimer] = useState(true);
     const [isDelete, setIsDelete] = useState(false);
 
     const animationValue = useRef(new Animated.Value(0)).current;
@@ -72,11 +76,12 @@ export default function PlacePage({ route }) {
     const [seconds, setSeconds] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [isFirst, setIsFirst] = useState(false);
+    const [hasTimer, setHasTimer] = useState(false);
     const [timerData, setTimerData] = useState([]);
-    const [rowKey, setRowKey] = useState(0)
+    const [rowKey, setRowKey] = useState(0);
     const runningRef = useRef(null);
 
-    const { isOpen } = useContext(AppContext);
+    const { isModified, setIsModified } = useContext(AppContext);
 
     const handleStartText = () => {
         if (isRunning) return "Pause";
@@ -87,6 +92,11 @@ export default function PlacePage({ route }) {
         if (isRunning) return "#F55451";
         else return "#6CE200";
     };
+
+    useEffect(() => {
+      if(timerData.length == 0) setHasTimer(false);
+      else setHasTimer(true)
+    }, [timerData])
 
     const handleTimeChange = (event, selectedTime) => {
         if (selectedTime) {
@@ -136,6 +146,7 @@ export default function PlacePage({ route }) {
         setMinutes(0);
         setSeconds(0);
         setIsFirst(false);
+        setHasTimer(true);
         setIsRunning(false);
     };
 
@@ -164,9 +175,9 @@ export default function PlacePage({ route }) {
             time -= minute * 60;
         }
         second = time;
-        console.log(hour, minute, time);
+        // console.log(hour, minute, time);
         return (
-            <Animated.View
+            <View
                 style={{
                     flex: 1,
                     backgroundColor: "#f6f8fb",
@@ -254,7 +265,7 @@ export default function PlacePage({ route }) {
                         </View>
                     </View>
                 </View>
-            </Animated.View>
+            </View>
         );
     };
 
@@ -268,7 +279,7 @@ export default function PlacePage({ route }) {
                     height: 70,
                     borderRadius: 10,
                     justifyContent: "center",
-                    alignItems: 'flex-end',
+                    alignItems: "flex-end",
                     interpolateTextAlignment,
                     paddingHorizontal: 16,
                     backgroundColor: "#FF0000",
@@ -293,19 +304,25 @@ export default function PlacePage({ route }) {
     };
 
     const fetchItems = async () => {
-        try {
-            const items = await getTimerItems(id);
-            const newData = items.reverse().map((item) => ({
-                timer_id: item.id,
-                date: item.date,
-                time: item.time,
-            }));
-            setTimerData(newData);
-            setRowKey(parseInt(newData[0]['timer_id']))
+      try {
+        const items = await getTimerItems(id);
+    
+        const newData = items.reverse().map((item) => ({
+          timer_id: item.id,
+          date: item.date,
+          time: item.time,
+        }));
+        setTimerData(newData);
+        setRowKey(parseInt(newData[0].timer_id));
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-        } catch (error) {
-            console.log(error);
-        }
+    const SetAlarm = () => {
+        addAlarmItem((place_id = id), (hour = hour), (minute = minute));
+        setIsModified(true);
+        navigation.navigate("Alarms");
     };
 
     return (
@@ -417,8 +434,8 @@ export default function PlacePage({ route }) {
                         textStyle={{ fontWeight: "bold" }}
                         selectedTextStyle={{ fontWeight: "bold" }}
                         options={[
-                            { label: "Alarm", value: false },
                             { label: "Timer", value: true },
+                            { label: "Alarm", value: false },
                         ]}
                     />
                 </View>
@@ -442,6 +459,8 @@ export default function PlacePage({ route }) {
                                     height: 50,
                                     marginTop: 20,
                                 }}
+                                onPress={SetAlarm}
+                                disabled={!hasTimer}
                             >
                                 Set Alarm
                             </Button>

@@ -97,24 +97,34 @@ export default function CreateModal() {
         } else if (transports.length == 0) {
             Alert.alert("", "Select at least one transportation!");
         } else {
-            if (checkIfPlaceItemExists((start = input1), (end = input2), (data = transports)).then((exists) => {
-                if (exists){
-                    Alert.alert("", "Itinerary already exists!");
-                }else {
-                    closeAndNavigate(transports);
-                }
-            }));
+            if (
+                checkIfPlaceItemExists(
+                    (start = input1),
+                    (end = input2),
+                    (data = transports)
+                ).then((exists) => {
+                    if (exists) {
+                        Alert.alert("", "Itinerary already exists!");
+                    } else {
+                        closeAndNavigate(transports);
+                    }
+                })
+            );
         }
     };
-    const closeAndNavigate = (transports) => {
+
+    const closeAndNavigate = async (transports) => {
         setIsModified(true);
         sheetRef.current.close();
-        const id = addPlaceItem(
+
+        addPlaceItem(
             (start = input1),
             (end = input2),
             (data = transports)
-        );
-        goToPlacePage(id, start, end, data);
+        ).then((id) => {
+            console.log("Place ID: " + id);
+            goToPlacePage(id, start, end, data);
+        });
     };
 
     return (

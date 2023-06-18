@@ -164,6 +164,11 @@ function HomeStack() {
             />
             <Tab.Screen
                 name="Alarms"
+                listeners={() => ({
+                    tabPress: (e) => {
+                        setIsModified(true);
+                    },
+                })}
                 component={Alarms}
                 options={{
                     headerTitle: "Alarms",
