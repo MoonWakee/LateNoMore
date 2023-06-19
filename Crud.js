@@ -13,7 +13,7 @@ export const initializeDatabase = () => {
             // "DROP TABLE IF EXISTS timer_items"
         );
         tx.executeSql(
-            "CREATE TABLE IF NOT EXISTS alarm_items (alarm_id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, hour INT, minute INT, isOn INT, subtract INT)"
+            "CREATE TABLE IF NOT EXISTS alarm_items (alarm_id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, hour INT, minute INT, isOn INT, subtract INT, minus_time INT)"
             // "DROP TABLE IF EXISTS alarm_items"
         );
     });
@@ -168,11 +168,11 @@ export const checkIfPlaceItemExists = (start, end, data) => {
     });
   };
   
-  export const addAlarmItem = (place_id, hour, minute, subtract) => {
+  export const addAlarmItem = (place_id, hour, minute, subtract, minus_time) => {
     db.transaction((tx) => {
         tx.executeSql(
-            "INSERT INTO alarm_items (place_id, hour, minute, isOn, subtract) VALUES (?, ?, ?, 1, ?)",
-            [place_id, hour, minute, subtract],
+            "INSERT INTO alarm_items (place_id, hour, minute, isOn, subtract, minus_time) VALUES (?, ?, ?, 1, ?, ?)",
+            [place_id, hour, minute, subtract, minus_time],
             (_, result) => {
                 // Handle success
                 const lastInsertId = result.insertId;
@@ -182,7 +182,8 @@ export const checkIfPlaceItemExists = (start, end, data) => {
                     place_id,
                     hour, 
                     minute,
-                    subtract
+                    subtract,
+                    minus_time
                 );
                 return lastInsertId;
             },
@@ -231,14 +232,14 @@ export const updateAlarmOn = (alarm_id, isOn) => {
     });
 };
 
-export const updateAlarmItem = (alarm_id, hour, minute, isOn, subtract) => {
+export const updateAlarmItem = (alarm_id, hour, minute, isOn, subtract, minus_time) => {
     db.transaction((tx) => {
         tx.executeSql(
-            "UPDATE alarm_items SET hour = ?, minute = ?, isOn = ?, subtract = ? WHERE alarm_id = ?",
-            [hour, minute, isOn, subtract, alarm_id],
+            "UPDATE alarm_items SET hour = ?, minute = ?, isOn = ?, subtract = ?, minus_time = ? WHERE alarm_id = ?",
+            [hour, minute, isOn, subtract, minus_time, alarm_id],
             (_, result) => {
                 // Handle success
-                console.log("Alarm Item updated successfully");
+                console.log("Alarm Item updated successfully: ", subtract, minus_time);
             },
             (_, error) => {
                 // Handle error

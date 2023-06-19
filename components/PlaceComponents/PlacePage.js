@@ -25,7 +25,20 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import SelectDropdown from "react-native-select-dropdown";
 
 export default function PlacePage({ route }) {
-    const { id, start, end, fromAlarm, initTime } = route.params;
+    const {
+        id,
+        start,
+        end,
+        fromAlarm,
+        initTime,
+        subtracted = -1,
+    } = route.params;
+
+    useEffect(() => {
+        if (fromAlarm == 1) {
+            setDropSelect(subtracted);
+        }
+    }, [fromAlarm]);
 
     useEffect(() => {
         fetchItems();
@@ -46,10 +59,8 @@ export default function PlacePage({ route }) {
         dateUse = dateNow.split(" ")[0];
     }
 
-    const AVAILABLE_HOURS = createArray(1, 12);
-    const AVAILABLE_MINS = createArray(0, 59);
-
     const navigation = useNavigation();
+    let [subtractIndex, setSubtractIndex] = useState(subtracted);
 
     let [hour, setHour] = useState(() => {
         if (initTime.length === 3) {
@@ -88,8 +99,48 @@ export default function PlacePage({ route }) {
     const [timerData, setTimerData] = useState([]);
     const [rowKey, setRowKey] = useState(0);
     const runningRef = useRef(null);
+    const [slowest, setSlowest] = useState(0);
+    const [average, setAverage] = useState(0);
+    const [fastest, setFastest] = useState(0);
+
+    useEffect(() => {
+        setSlowest(Math.max(...timerData.map((item) => parseFloat(item.time))));
+        const total = timerData.reduce(
+            (sum, item) => sum + parseFloat(item.time),
+            0
+        );
+        setAverage(Math.round(total / timerData.length));
+        setFastest(Math.min(...timerData.map((item) => parseFloat(item.time))));
+    }, [timerData]);
 
     const { isModified, setIsModified } = useContext(AppContext);
+
+    const subtractText = (sec) => {
+        let hour = 0,
+            minute = 0,
+            second = 0;
+
+        if (sec > 3600) {
+            hour = Math.floor(sec / 3600);
+            sec -= hour * 3600;
+        }
+        if (sec > 60) {
+            minute = Math.floor(sec / 60);
+            sec -= minute * 60;
+        }
+        second = sec;
+        let texter = "";
+
+        if (hour > 0) {
+            texter += ` ${hour} hr`;
+        }
+        if (minute > 0) {
+            texter += ` ${minute} min`;
+        }
+        texter += ` ${second} sec`;
+
+        return texter;
+    };
 
     const handleStartText = () => {
         if (isRunning) return "Pause";
@@ -339,6 +390,11 @@ export default function PlacePage({ route }) {
     };
 
     const SetAlarm = () => {
+        let minus_time = 0;
+        if (dropSelect === 0) minus_time = fastest;
+        else if (dropSelect === 1) minus_time = average;
+        else minus_time = slowest;
+
         if (dropSelect === -1) {
             Alert.alert("Select the subtracting time!", "");
             return;
@@ -348,16 +404,18 @@ export default function PlacePage({ route }) {
                 (place_id = id),
                 (hour = hour),
                 (minute = minute),
-                (subtract = dropSelect)
+                (subtract = dropSelect),
+                (minus_time = minus_time)
             );
         } else {
-            console.log(dropSelect);
+            // console.log(dropSelect);
             updateAlarmItem(
                 (alarm_id = alarmId),
                 (hour = hour),
                 (minute = minute),
                 (isOn = 1),
-                (subtract = dropSelect)
+                (subtract = dropSelect),
+                (minus_time = minus_time)
             );
         }
 
@@ -493,25 +551,31 @@ export default function PlacePage({ route }) {
                                 display="spinner"
                                 onChange={handleTimeChange}
                             />
-                            <SelectDropdown
-                                // defaultValueByIndex={0}
-                                renderDropdownIcon={dropDownRenderer}
-                                dropdownIconPosition="right"
-                                buttonStyle={{
-                                    width: Dimensions.get("window").width - 40,
-                                    borderRadius: 10,
-                                }}
-                                rowStyle={{ backgroundColor: "#e6e6e6" }}
-                                data={[
-                                    "- Fastest time : 24 hr 24 min 24 sec",
-                                    "- Average time : 24 hr 24 min 24 sec",
-                                    "- Slowest time : 24 hr 24 min 24 sec",
-                                ]}
-                                defaultButtonText="Select the subtracting time"
-                                onSelect={(selectedItem, index) => {
-                                    setDropSelect(index);
-                                }}
-                            />
+                            {!!fastest && !!slowest && !!average && (
+                                <SelectDropdown
+                                    defaultValueByIndex={subtractIndex}
+                                    renderDropdownIcon={dropDownRenderer}
+                                    dropdownIconPosition="right"
+                                    buttonStyle={{
+                                        width:
+                                            Dimensions.get("window").width - 40,
+                                        borderRadius: 10,
+                                    }}
+                                    rowStyle={{ backgroundColor: "#e6e6e6" }}
+                                    data={[
+                                        "- Fastest time :" +
+                                            subtractText(fastest),
+                                        "- Average time :" +
+                                            subtractText(average),
+                                        "- Slowest time :" +
+                                            subtractText(slowest),
+                                    ]}
+                                    defaultButtonText="Select the subtracting time"
+                                    onSelect={(selectedItem, index) => {
+                                        setDropSelect(index);
+                                    }}
+                                />
+                            )}
                             <Button
                                 titleStyle={{
                                     fontWeight: "bold",
@@ -638,7 +702,9 @@ export default function PlacePage({ route }) {
                                     }}
                                     buttonStyle={{
                                         height: 70,
-                                        width: 180,
+                                        width:
+                                            Dimensions.get("window").width / 2 -
+                                            30,
                                         borderRadius: 50,
                                         backgroundColor: handleStartColor(),
                                     }}
@@ -660,7 +726,9 @@ export default function PlacePage({ route }) {
                                     }}
                                     buttonStyle={{
                                         height: 70,
-                                        width: 180,
+                                        width:
+                                            Dimensions.get("window").width / 2 -
+                                            30,
                                         borderRadius: 100,
                                     }}
                                     onPress={handleSave}

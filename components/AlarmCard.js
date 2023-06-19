@@ -59,6 +59,7 @@ export default function AlarmCard({ alarm_id, place_id, hour, minute, isOn, subt
             end,
             fromAlarm: 1,
             initTime: [hour, minute, alarm_id],
+            subtracted: subtract
         });
         setTimeout(() => {
             setIsPressed(false);
