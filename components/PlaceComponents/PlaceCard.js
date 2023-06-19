@@ -17,7 +17,7 @@ import AppContext from "../../navigation/AppContext.js";
 export default function PlaceCard({ id, start, end, data }) {
     const navigation = useNavigation();
     const goToPlacePage = () => {
-        navigation.navigate("PlacePage", { id, start, end, data });
+        navigation.navigate("PlacePage", { id, start, end, fromAlarm: 0, initTime: [0] });
         setTimeout(() => {
             setIsPressed(false);
         }, 1000);
@@ -199,29 +199,29 @@ export default function PlaceCard({ id, start, end, data }) {
                 handlePressIn();
                 goToPlacePage();
             }}
-            onLongPress={() => {
-                handlePressIn();
-                Alert.alert(
-                    "Do you want to delete?",
-                    `From: ${start} \nTo: ${end}`,
-                    [
-                        {
-                            text: "Cancel",
-                            style: "cancel",
-                            fontSize: 30
-                        },
-                        {
-                            text: "Delete",
-                            onPress: () => {
-                                deletePlaceItem(id)
-                                setIsModified(true)
+            // onLongPress={() => {
+            //     handlePressIn();
+            //     Alert.alert(
+            //         "Do you want to delete?",
+            //         `From: ${start} \nTo: ${end}`,
+            //         [
+            //             {
+            //                 text: "Cancel",
+            //                 style: "cancel",
+            //                 fontSize: 30
+            //             },
+            //             {
+            //                 text: "Delete",
+            //                 onPress: () => {
+            //                     deletePlaceItem(id)
+            //                     setIsModified(true)
                                 
-                            },
-                            style: "destructive",
-                        },
-                    ]
-                );
-            }}
+            //                 },
+            //                 style: "destructive",
+            //             },
+            //         ]
+            //     );
+            // }}
             onPressOut={handlePressOut}
         >
             <View
@@ -294,16 +294,8 @@ export default function PlaceCard({ id, start, end, data }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: "#A7BAD3",
-        // backgroundColor: "white",
         borderRadius: 15,
         justifyContent: "center",
-        // borderColor: "#dd602d",
-        // backgroundColor: '#92A8D1',
-        // borderColor: "#e32f45",
-        // borderLeftWidth: 3,
-        // borderBottomWidth: 8,
-        // borderTopWidth: 5,
         alignSelf: "center",
         margin: 15,
         aspectRatio: 3,

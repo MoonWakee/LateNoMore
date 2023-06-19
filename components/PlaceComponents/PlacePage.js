@@ -6,6 +6,8 @@ import {
     Animated,
     FlatList,
     Dimensions,
+    TouchableOpacity,
+    Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AppContext from "../../navigation/AppContext";
@@ -17,11 +19,18 @@ import {
     getTimerItems,
     deleteTimerItem,
     addAlarmItem,
+    updateAlarmItem,
 } from "../../Crud";
 import { SwipeListView } from "react-native-swipe-list-view";
+import SelectDropdown from "react-native-select-dropdown";
 
 export default function PlacePage({ route }) {
-    const { id, start, end, data } = route.params;
+    const { id, start, end, fromAlarm, initTime } = route.params;
+
+    useEffect(() => {
+        fetchItems();
+    }, [id]);
+
     const createArray = (i, num) => {
         const arr = [];
         for (; i <= num; i++) {
@@ -42,34 +51,33 @@ export default function PlacePage({ route }) {
 
     const navigation = useNavigation();
 
-    let [hour, setHour] = useState(new Date().getHours());
-    let [minute, setMinute] = useState(new Date().getMinutes());
-    const [date, setDate] = useState(new Date());
-    const [isTimer, setIsTimer] = useState(true);
-    const [isDelete, setIsDelete] = useState(false);
-
-    const animationValue = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        if (isDelete) {
-            Animated.timing(animationValue, {
-                toValue: 1,
-                duration: 200,
-                useNativeDriver: false,
-            }).start();
-        } else {
-            Animated.timing(animationValue, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: false,
-            }).start();
+    let [hour, setHour] = useState(() => {
+        if (initTime.length === 3) {
+            return initTime[0];
         }
-    }, [isDelete, animationValue]);
-
-    const interpolateTextAlignment = animationValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, 100],
+        return new Date().getHours();
     });
+    let [minute, setMinute] = useState(() => {
+        if (initTime.length === 3) {
+            return initTime[1];
+        }
+        return new Date().getMinutes();
+    });
+    const [date, setDate] = useState(() => {
+        const currentDate = new Date();
+        if (initTime.length === 3) {
+            currentDate.setHours(initTime[0]);
+            currentDate.setMinutes(initTime[1]);
+        }
+        return currentDate;
+    });
+    let [alarmId, setAlarmId] = useState(
+        initTime.length === 3 ? initTime[2] : -1
+    );
+    const [isAlarm, setIsAlarm] = useState(parseInt(fromAlarm));
+    const [isDelete, setIsDelete] = useState(false);
+    let [curOpened, setCurOpened] = useState(-1);
+    let [dropSelect, setDropSelect] = useState(-1);
 
     const [hours, setHours] = useState(0);
     const [minutes, setMinutes] = useState(0);
@@ -94,9 +102,9 @@ export default function PlacePage({ route }) {
     };
 
     useEffect(() => {
-      if(timerData.length == 0) setHasTimer(false);
-      else setHasTimer(true)
-    }, [timerData])
+        if (timerData.length == 0) setHasTimer(false);
+        else setHasTimer(true);
+    }, [timerData]);
 
     const handleTimeChange = (event, selectedTime) => {
         if (selectedTime) {
@@ -156,10 +164,6 @@ export default function PlacePage({ route }) {
         };
     }, []);
 
-    useEffect(() => {
-        fetchItems();
-    }, []);
-
     const TimerItem = ({ item }) => {
         let time = parseInt(item.time);
         let hour = 0,
@@ -175,7 +179,6 @@ export default function PlacePage({ route }) {
             time -= minute * 60;
         }
         second = time;
-        // console.log(hour, minute, time);
         return (
             <View
                 style={{
@@ -271,7 +274,7 @@ export default function PlacePage({ route }) {
 
     const HiddenItem = () => {
         return (
-            <Animated.View
+            <View
                 style={{
                     flex: 1,
                     marginHorizontal: 10,
@@ -280,49 +283,90 @@ export default function PlacePage({ route }) {
                     borderRadius: 10,
                     justifyContent: "center",
                     alignItems: "flex-end",
-                    interpolateTextAlignment,
+                    marginLeft: 20,
                     paddingHorizontal: 16,
                     backgroundColor: "#FF0000",
                 }}
             >
-                <Text
-                    style={{ fontSize: 18, color: "white", fontWeight: "bold" }}
+                <TouchableOpacity
+                    onPress={() => {
+                        setIsDelete(!isDelete);
+                        deleteTimerItem(curOpened);
+                        fetchItems();
+                    }}
                 >
-                    Delete
-                </Text>
-            </Animated.View>
+                    <Text
+                        style={{
+                            fontSize: 18,
+                            color: "white",
+                            fontWeight: "bold",
+                        }}
+                    >
+                        Delete
+                    </Text>
+                </TouchableOpacity>
+            </View>
         );
     };
 
     const handleSwipeValueChange = (swipeData, swipeRow) => {
         const { key, value } = swipeData;
-        if (value < -Dimensions.get("window").width) {
-            setIsDelete(!isDelete);
-            deleteTimerItem(key);
-            fetchItems();
+        if (value < -30) {
+            setCurOpened(key);
         }
+        // --- Used to swipe to delete, but changed to swipe and click
+        // if (value < -Dimensions.get("window").width) {
+        //     setIsDelete(!isDelete);
+        //     deleteTimerItem(key);
+        //     fetchItems();
+        // }
     };
 
     const fetchItems = async () => {
-      try {
-        const items = await getTimerItems(id);
-    
-        const newData = items.reverse().map((item) => ({
-          timer_id: item.id,
-          date: item.date,
-          time: item.time,
-        }));
-        setTimerData(newData);
-        setRowKey(parseInt(newData[0].timer_id));
-      } catch (error) {
-        console.log(error);
-      }
+        try {
+            const items = await getTimerItems(id);
+
+            const newData = items.reverse().map((item) => ({
+                timer_id: item.id,
+                date: item.date,
+                time: item.time,
+            }));
+            setTimerData(newData);
+            setRowKey(parseInt(newData[0].timer_id));
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const SetAlarm = () => {
-        addAlarmItem((place_id = id), (hour = hour), (minute = minute));
+        if (dropSelect === -1) {
+            Alert.alert("Select the subtracting time!", "");
+            return;
+        }
+        if (alarmId === -1) {
+            addAlarmItem(
+                (place_id = id),
+                (hour = hour),
+                (minute = minute),
+                (subtract = dropSelect)
+            );
+        } else {
+            console.log(dropSelect);
+            updateAlarmItem(
+                (alarm_id = alarmId),
+                (hour = hour),
+                (minute = minute),
+                (isOn = 1),
+                (subtract = dropSelect)
+            );
+        }
+
         setIsModified(true);
         navigation.navigate("Alarms");
+    };
+
+    const dropDownRenderer = () => {
+        return <Icon type="font-awesome" name="caret-down" marginRight={5} />;
     };
 
     return (
@@ -422,9 +466,9 @@ export default function PlacePage({ route }) {
             <View style={{ flex: 5 }}>
                 <View style={{ marginHorizontal: 50, marginTop: 30 }}>
                     <SwitchSelector
-                        initial={0}
+                        initial={fromAlarm}
                         height={60}
-                        onPress={(value) => setIsTimer(value)}
+                        onPress={(value) => setIsAlarm(value)}
                         textColor={"#a8bbd6"}
                         selectedColor={"white"}
                         buttonColor={"#a8bbd6"}
@@ -434,13 +478,13 @@ export default function PlacePage({ route }) {
                         textStyle={{ fontWeight: "bold" }}
                         selectedTextStyle={{ fontWeight: "bold" }}
                         options={[
-                            { label: "Timer", value: true },
-                            { label: "Alarm", value: false },
+                            { label: "Timer", value: 0 },
+                            { label: "Alarm", value: 1 },
                         ]}
                     />
                 </View>
                 <View style={{ marginTop: 10, marginHorizontal: 20 }}>
-                    {!isTimer && (
+                    {isAlarm === 1 && (
                         <>
                             <DateTimePicker
                                 value={date}
@@ -448,6 +492,25 @@ export default function PlacePage({ route }) {
                                 mode="time"
                                 display="spinner"
                                 onChange={handleTimeChange}
+                            />
+                            <SelectDropdown
+                                // defaultValueByIndex={0}
+                                renderDropdownIcon={dropDownRenderer}
+                                dropdownIconPosition="right"
+                                buttonStyle={{
+                                    width: Dimensions.get("window").width - 40,
+                                    borderRadius: 10,
+                                }}
+                                rowStyle={{ backgroundColor: "#e6e6e6" }}
+                                data={[
+                                    "- Fastest time : 24 hr 24 min 24 sec",
+                                    "- Average time : 24 hr 24 min 24 sec",
+                                    "- Slowest time : 24 hr 24 min 24 sec",
+                                ]}
+                                defaultButtonText="Select the subtracting time"
+                                onSelect={(selectedItem, index) => {
+                                    setDropSelect(index);
+                                }}
                             />
                             <Button
                                 titleStyle={{
@@ -466,7 +529,7 @@ export default function PlacePage({ route }) {
                             </Button>
                         </>
                     )}
-                    {isTimer && (
+                    {isAlarm === 0 && (
                         <>
                             <View
                                 style={{
@@ -609,7 +672,7 @@ export default function PlacePage({ route }) {
                         </>
                     )}
                 </View>
-                {isTimer && (
+                {isAlarm === 0 && (
                     <View style={{ flex: 1, marginTop: 30 }}>
                         {/* <FlatList
                             data={timerData}
@@ -622,7 +685,7 @@ export default function PlacePage({ route }) {
                             disableRightSwipe
                             renderItem={TimerItem}
                             renderHiddenItem={HiddenItem}
-                            rightOpenValue={-Dimensions.get("window").width}
+                            rightOpenValue={-100}
                             // previewOpenValue={-30}
                             // previewOpenDelay={1000}
                             // previewRowKey={rowKey}

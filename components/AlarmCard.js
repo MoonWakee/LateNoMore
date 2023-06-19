@@ -5,16 +5,20 @@ import {
     Dimensions,
     TouchableWithoutFeedback,
     Alert,
-    ActivityIndicator,
     Switch,
 } from "react-native";
-import React, { useEffect, useState , useContext} from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Input } from "@rneui/base";
-import { deletePlaceItem, getPlaceItem, deleteAlarmItem } from "../Crud.js";
+import {
+    deletePlaceItem,
+    getPlaceItem,
+    deleteAlarmItem,
+    updateAlarmOn,
+} from "../Crud.js";
 import AppContext from "../navigation/AppContext.js";
 
-export default function AlarmCard({ id, place_id, hour, minute }) {
+export default function AlarmCard({ alarm_id, place_id, hour, minute, isOn, subtract }) {
     const [start, setStart] = useState("");
     const [end, setEnd] = useState("");
     const [data, setData] = useState([]);
@@ -45,11 +49,17 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
         setModifiedMin(newMin.toString().padStart(2, "0"));
         setModifiedHour(newHour);
         setMidday(newMidday);
-    }, [hour]);
+    }, [hour, minute]);
 
     const navigation = useNavigation();
     const goToPlacePage = () => {
-        navigation.navigate("PlacePage", { id, start, end, data });
+        navigation.navigate("PlacePage", {
+            id: place_id,
+            start,
+            end,
+            fromAlarm: 1,
+            initTime: [hour, minute, alarm_id],
+        });
         setTimeout(() => {
             setIsPressed(false);
         }, 1000);
@@ -61,7 +71,6 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
             setStart(item.start);
             setEnd(item.end);
             setData(item.data);
-            console.log(item.start);
         } catch (error) {
             console.log(error);
         }
@@ -71,10 +80,21 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
         fetchPlaceItem();
     }, [place_id]);
 
+    const [timeText, setTimeText] = useState('');
+
+    useEffect(()=> {
+        if(subtract === 0)  setTimeText("- Fastest time")  
+        else if(subtract === 1)  setTimeText("- Average time")
+        else  setTimeText("- Slowest time")
+    }, [subtract])
+
     const [arr, setArr] = useState([]);
 
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+    const [isEnabled, setIsEnabled] = useState(!!isOn);
+    const toggleSwitch = () => {
+        updateAlarmOn((alarm_id = alarm_id), (isOn = isEnabled ? 0 : 1));
+        setIsEnabled((previousState) => !previousState);
+    };
 
     const iconSettler = (data) => {
         const new_data = data.substring(1, data.length - 1);
@@ -225,174 +245,180 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
 
     const { isModified, setIsModified } = useContext(AppContext);
 
-
     return (
         // <></>
         <View>
-            {end.length === 0 ? (
-                <View style={styles.activityContainer}>
-                    <ActivityIndicator />
-                </View>
-            ) : (
-                <TouchableWithoutFeedback
-                    onLongPress={() => {
-                        handlePressIn();
-                        Alert.alert(
-                            "Delete Alarm?", 
-                            '',
-                            [
-                                {
-                                    text: "No",
-                                    style: "cancel",
-                                    fontSize: 30,
-                                },
-                                {
-                                    text: "Yes",
-                                    onPress: () => {
-                                        deleteAlarmItem(id);
-                                        setIsModified(true)
-                                    },
-                                    style: "destructive",
-                                },
-                            ]
-                        );
-                    }}
-                    onPressOut={handlePressOut}
-                >
-                    <View
-                        style={[
-                            styles.container,
-                            {
-                                backgroundColor: isPressed
-                                    ? "#e6e6e6"
-                                    : "white",
+            <TouchableWithoutFeedback
+                onPress={() => {
+                    handlePressIn();
+                    goToPlacePage();
+                }}
+                onLongPress={() => {
+                    handlePressIn();
+                    Alert.alert("Delete Alarm?", "", [
+                        {
+                            text: "No",
+                            style: "cancel",
+                            fontSize: 30,
+                        },
+                        {
+                            text: "Yes",
+                            onPress: () => {
+                                deleteAlarmItem(id);
+                                setIsModified(true);
                             },
-                        ]}
-                    >
-                        <View style={{ flex: 1, flexDirection: "column" }}>
-                            <View
-                                style={{
-                                    flex: 3,
-                                    alignItems: "flex-start",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <View style={{ flex: 1, flexDirection: "row" }}>
-                                    <View
-                                        style={{
-                                            flex: 1,
-                                            marginLeft: 30,
-                                            flexDirection: "row",
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                fontSize: 60,
-                                                fontWeight: "400",
-                                            }}
-                                        >
-                                            {modifiedHour}:{modifiedMin}
-                                        </Text>
-                                        <Text
-                                            style={{
-                                                fontSize: 40,
-                                                marginTop: 15,
-                                                fontWeight: "300",
-                                            }}
-                                        >
-                                            {midday}
-                                        </Text>
-                                    </View>
-                                    <View
-                                        style={{
-                                            flex: 1,
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            marginLeft: 40
-                                        }}
-                                    >
-                                        <Switch
-                                            trackColor={{
-                                                false: "#767577",
-                                                true: "#6CE200",
-                                            }}
-                                            thumbColor={"white"}
-                                            ios_backgroundColor="#3e3e3e"
-                                            onValueChange={toggleSwitch}
-                                            value={isEnabled}
-                                            style={{ transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }] }}
-                                            />
-                                    </View>
-                                </View>
-                            </View>
-                            <View
-                                style={{
-                                    flex: 2.2,
-                                    flexDirection: "row",
-                                    marginLeft: 10,
-                                }}
-                            >
+                            style: "destructive",
+                        },
+                    ]);
+                }}
+                onPressOut={handlePressOut}
+            >
+                <View
+                    style={[
+                        styles.container,
+                        {
+                            backgroundColor: isPressed ? "#e6e6e6" : "white",
+                        },
+                    ]}
+                >
+                    <View style={{ flex: 1, flexDirection: "column" }}>
+                        <View
+                            style={{
+                                flex: 3,
+                                alignItems: "flex-start",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <View style={{ flex: 1, flexDirection: "row" }}>
                                 <View
                                     style={{
-                                        justifyContent: "center",
-                                        flex: 1.3,
-                                        marginLeft: 10,
+                                        flex: 1,
+                                        marginLeft: 30,
+                                        flexDirection: "row",
                                     }}
                                 >
-                                    <View style={{ flexDirection: "row" }}>
-                                        <Icon
-                                            type="font-awesome"
-                                            name="location-arrow"
-                                            color="#2596be"
-                                            size={25}
-                                            width={25}
-                                        />
-                                        <Text
-                                            style={{
-                                                fontSize:
-                                                    start.length < 20 ? 18 : 13,
-                                                marginLeft: 10,
-                                                fontWeight: "300",
-                                                flexShrink: 1,
-                                            }}
-                                        >
-                                            {start}
-                                        </Text>
-                                    </View>
-                                    <View style={{ flexDirection: "row" }}>
-                                        <Icon
-                                            type="font-awesome"
-                                            name="flag"
-                                            color="#cd5554"
-                                            size={22}
-                                            width={25}
-                                        />
-                                        <Text
-                                            style={{
-                                                marginLeft: 10,
-                                                fontWeight: "300",
-                                                fontSize:
-                                                    end.length < 20 ? 18 : 13,
-                                                flexShrink: 1,
-                                            }}
-                                        >
-                                            {end}
-                                        </Text>
-                                    </View>
+                                    <Text
+                                        style={{
+                                            fontSize: 60,
+                                            fontWeight: "400",
+                                        }}
+                                    >
+                                        {modifiedHour}:{modifiedMin}
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontSize: 40,
+                                            marginTop: 15,
+                                            fontWeight: "300",
+                                        }}
+                                    >
+                                        {midday}
+                                    </Text>
                                 </View>
                                 <View
                                     style={{
                                         flex: 1,
+                                        justifyContent: "center",
                                         alignItems: "center",
+                                        marginLeft: 40,
                                     }}
                                 >
-                                    <IconDivs />
+                                    <Switch
+                                        trackColor={{
+                                            false: "#767577",
+                                            true: "#6CE200",
+                                        }}
+                                        thumbColor={"white"}
+                                        ios_backgroundColor="#3e3e3e"
+                                        onValueChange={toggleSwitch}
+                                        value={isEnabled}
+                                        style={{
+                                            transform: [
+                                                { scaleX: 1.2 },
+                                                { scaleY: 1.2 },
+                                            ],
+                                        }}
+                                    />
                                 </View>
                             </View>
                         </View>
+                        <View
+                            style={{
+                                flex: 2.2,
+                                flexDirection: "row",
+                                marginLeft: 10,
+                            }}
+                        >
+                            <View
+                                style={{
+                                    justifyContent: "center",
+                                    flex: 1.3,
+                                    marginLeft: 10,
+                                }}
+                            >
+                                <View style={{ flexDirection: "row" }}>
+                                    <Icon
+                                        type="font-awesome"
+                                        name="location-arrow"
+                                        color="#2596be"
+                                        size={25}
+                                        width={25}
+                                    />
+                                    <Text
+                                        style={{
+                                            fontSize:
+                                                start.length < 20 ? 18 : 13,
+                                            marginLeft: 10,
+                                            fontWeight: "300",
+                                            flexShrink: 1,
+                                        }}
+                                    >
+                                        {start}
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: "row" }}>
+                                    <Icon
+                                        type="font-awesome"
+                                        name="flag"
+                                        color="#cd5554"
+                                        size={22}
+                                        width={25}
+                                    />
+                                    <Text
+                                        style={{
+                                            marginLeft: 10,
+                                            fontWeight: "300",
+                                            fontSize: end.length < 20 ? 18 : 13,
+                                            flexShrink: 1,
+                                        }}
+                                    >
+                                        {end}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View
+                                style={{
+                                    flex: 1,
+                                    alignItems: "center",
+                                    flexDirection: "column",
+                                }}
+                            >
+                                <View>
+                                    <Text
+                                        style={{
+                                            fontWeight: "600",
+                                            fontSize: 18,
+                                        }}
+                                    >
+                                        {timeText}
+                                    </Text>
+                                </View>
+                                <IconDivs />
+                            </View>
+                        </View>
                     </View>
-                </TouchableWithoutFeedback>
-            )}
+                </View>
+            </TouchableWithoutFeedback>
         </View>
     );
 }
@@ -400,8 +426,20 @@ export default function AlarmCard({ id, place_id, hour, minute }) {
 const styles = StyleSheet.create({
     activityContainer: {
         flex: 1,
-        alignItems: "center",
+        borderRadius: 15,
         justifyContent: "center",
+        alignSelf: "center",
+        margin: 15,
+        aspectRatio: 3,
+        height: (Dimensions.get("window").width - 40) * 0.34,
+        Width: Dimensions.get("window").width - 60,
+        shadowColor: "#000",
+        shadowRadius: 10,
+        shadowOpacity: 0.2,
+        shadowOffset: {
+            width: 0,
+            height: 5,
+        },
     },
     container: {
         flex: 1,
@@ -476,5 +514,5 @@ const styles = StyleSheet.create({
         flex: 0.25,
         alignItems: "center",
         // backgroundColor: 'red',
-    }
+    },
 });

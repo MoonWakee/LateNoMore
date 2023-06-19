@@ -80,7 +80,7 @@ export default function CreateModal() {
     const navigation = useNavigation();
 
     const goToPlacePage = (id, start, end, date) => {
-        navigation.navigate("PlacePage", { id, start, end, data });
+        navigation.navigate("PlacePage", { id, start, end, fromAlarm: 0, initTime: [0] });
     };
 
     const checkInputs = () => {

@@ -13,7 +13,7 @@ export const initializeDatabase = () => {
             // "DROP TABLE IF EXISTS timer_items"
         );
         tx.executeSql(
-            "CREATE TABLE IF NOT EXISTS alarm_items (id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, hour INT, minute INT)"
+            "CREATE TABLE IF NOT EXISTS alarm_items (alarm_id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, hour INT, minute INT, isOn INT, subtract INT)"
             // "DROP TABLE IF EXISTS alarm_items"
         );
     });
@@ -168,20 +168,21 @@ export const checkIfPlaceItemExists = (start, end, data) => {
     });
   };
   
-  export const addAlarmItem = (place_id, hour, minute) => {
+  export const addAlarmItem = (place_id, hour, minute, subtract) => {
     db.transaction((tx) => {
         tx.executeSql(
-            "INSERT INTO alarm_items (place_id, hour, minute) VALUES (?, ?, ?)",
-            [place_id, hour, minute],
+            "INSERT INTO alarm_items (place_id, hour, minute, isOn, subtract) VALUES (?, ?, ?, 1, ?)",
+            [place_id, hour, minute, subtract],
             (_, result) => {
                 // Handle success
                 const lastInsertId = result.insertId;
                 console.log(
-                    "Alerm item added with ID:",
+                    "Alarm item added with ID:",
                     lastInsertId,
                     place_id,
                     hour, 
-                    minute
+                    minute,
+                    subtract
                 );
                 return lastInsertId;
             },
@@ -210,6 +211,40 @@ export const getAlarmItems = () => {
                 }
             );
         });
+    });
+};
+
+export const updateAlarmOn = (alarm_id, isOn) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "UPDATE alarm_items SET isOn = ? WHERE alarm_id = ?",
+            [isOn, alarm_id],
+            (_, result) => {
+                // Handle success
+                console.log("Alarm Toggle updated successfully");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error updating Alarm Toggle:", error);
+            }
+        );
+    });
+};
+
+export const updateAlarmItem = (alarm_id, hour, minute, isOn, subtract) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "UPDATE alarm_items SET hour = ?, minute = ?, isOn = ?, subtract = ? WHERE alarm_id = ?",
+            [hour, minute, isOn, subtract, alarm_id],
+            (_, result) => {
+                // Handle success
+                console.log("Alarm Item updated successfully");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error updating Alarm item:", error);
+            }
+        );
     });
 };
 
@@ -250,7 +285,7 @@ export const deleteTimerItem = (id) => {
 export const deletePlaceItem = (id) => {
     db.transaction((tx) => {
         tx.executeSql(
-            "DELETE FROM alerm_items WHERE place_id = ?",
+            "DELETE FROM alarm_items WHERE place_id = ?",
             [id],
             (_, result) => {
                 // Handle success
@@ -293,7 +328,7 @@ export const deletePlaceItem = (id) => {
 export const deleteAlarmItem = (id) => {
     db.transaction((tx) => {
         tx.executeSql(
-            "DELETE FROM alarm_items WHERE id = ?",
+            "DELETE FROM alarm_items WHERE alarm_id = ?",
             [id],
             (_, result) => {
                 // Handle success
