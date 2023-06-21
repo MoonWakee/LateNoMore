@@ -55,7 +55,6 @@ export default function PlacePage({ route }) {
         initTime,
         subtracted = -1,
     } = route.params;
-
     useEffect(() => {
         if (fromAlarm == 1) {
             setDropSelect(subtracted);
@@ -205,10 +204,19 @@ export default function PlacePage({ route }) {
               }
               return (prevSeconds + 1) % 60;
             });
+            console.log("interval running: " )
           }, 1000);
-          return BackgroundFetch.registerTaskAsync(BACKGROUND_TASK_NAME, {
-            minimumInterval: 60, 
+          const taskRegistered = await BackgroundFetch.registerTaskAsync(BACKGROUND_TASK_NAME, {
+            minimumInterval: 60,
+            stopOnTerminate: false, // Allow the task to continue running after the app is terminated
+            startOnBoot: true, // Start the task automatically on device boot
           });
+      
+          if (taskRegistered) {
+            console.log('Background task registered successfully.');
+          } else {
+            console.log('Failed to register background task.');
+          }
         }
       };
       
