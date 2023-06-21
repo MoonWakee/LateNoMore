@@ -23,6 +23,28 @@ import {
 } from "../../Crud";
 import { SwipeListView } from "react-native-swipe-list-view";
 import SelectDropdown from "react-native-select-dropdown";
+import Notification from "../Notification";
+import * as TaskManager from 'expo-task-manager';
+import * as BackgroundFetch from 'expo-background-fetch';
+
+const BACKGROUND_TASK_NAME = 'backgroundCounter';
+
+TaskManager.defineTask(BACKGROUND_TASK_NAME, async ({ data, error }) => {
+    if (error) {
+      console.error('An error occurred in the background task:', error);
+      return BackgroundFetch.Result.Failed;
+    }
+  
+    console.log('What is happening now');
+    // Update your timer state here
+    // For example:
+    setSeconds((prevSeconds) => prevSeconds + 1);
+  
+    // Return BackgroundFetch.Result.NewData to indicate success
+    return BackgroundFetch.Result.NewData;
+  });
+
+
 
 export default function PlacePage({ route }) {
     const {
@@ -166,32 +188,34 @@ export default function PlacePage({ route }) {
             setDate(selectedTime);
         }
     };
-
-    const handleStart = () => {
+    
+      const handleStart = async () => {
         setIsFirst(true);
         if (runningRef.current === null) {
-            runningRef.current = setInterval(() => {
-                setSeconds((prevSeconds) => {
-                    if (prevSeconds === 59) {
-                        setMinutes((prevMinutes) => {
-                            if (prevMinutes === 59) {
-                                setHours((prevHours) => prevHours + 1);
-                                return 0;
-                            }
-                            return prevMinutes + 1;
-                        });
-                        return 0;
-                    }
-                    return prevSeconds + 1;
+          runningRef.current = setInterval(() => {
+            setSeconds((prevSeconds) => {
+              if (prevSeconds === 59) {
+                setMinutes((prevMinutes) => {
+                  if (prevMinutes === 59) {
+                    setHours((prevHours) => prevHours + 1);
+                    return 0;
+                  }
+                  return prevMinutes + 1;
                 });
-            }, 1000);
+              }
+              return (prevSeconds + 1) % 60;
+            });
+          }, 1000);
+          return BackgroundFetch.registerTaskAsync(BACKGROUND_TASK_NAME, {
+            minimumInterval: 60, 
+          });
         }
-    };
-
-    const handleStop = () => {
+      };
+      
+      const handleStop = () => {
         clearInterval(runningRef.current);
         runningRef.current = null;
-    };
+      };
 
     const handleSave = () => {
         handleStop();
