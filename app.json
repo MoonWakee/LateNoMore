@@ -3,7 +3,6 @@
     "name": "GetOut",
     "slug": "GetOut",
     "version": "1.0.0",
-    "permissions": ["BACKGROUND_FETCH"],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,14 +17,18 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": ["fetch"]
-      }
+        "UIBackgroundModes": [
+          "fetch"
+        ]
+      },
+      "bundleIdentifier": "com.anonymous.GetOut"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.GetOut"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -23,28 +23,27 @@ import {
 } from "../../Crud";
 import { SwipeListView } from "react-native-swipe-list-view";
 import SelectDropdown from "react-native-select-dropdown";
-import Notification from "../Notification";
-import * as TaskManager from 'expo-task-manager';
-import * as BackgroundFetch from 'expo-background-fetch';
+import { setNotification } from "../Notification";
+import * as TaskManager from "expo-task-manager";
+import * as BackgroundFetch from "expo-background-fetch";
+import BackgroundTimer from "react-native-background-timer";
 
-const BACKGROUND_TASK_NAME = 'backgroundCounter';
+// const BACKGROUND_TASK_NAME = 'backgroundCounter';
 
-TaskManager.defineTask(BACKGROUND_TASK_NAME, async ({ data, error }) => {
-    if (error) {
-      console.error('An error occurred in the background task:', error);
-      return BackgroundFetch.Result.Failed;
-    }
-  
-    console.log('What is happening now');
-    // Update your timer state here
-    // For example:
-    setSeconds((prevSeconds) => prevSeconds + 1);
-  
-    // Return BackgroundFetch.Result.NewData to indicate success
-    return BackgroundFetch.Result.NewData;
-  });
+// TaskManager.defineTask(BACKGROUND_TASK_NAME, async ({ data, error }) => {
+//     if (error) {
+//       console.error('An error occurred in the background task:', error);
+//       return BackgroundFetch.Result.Failed;
+//     }
 
+//     console.log('What is happening now');
+//     // Update your timer state here
+//     // For example:
+//     setSeconds((prevSeconds) => prevSeconds + 1);
 
+//     // Return BackgroundFetch.Result.NewData to indicate success
+//     return BackgroundFetch.Result.NewData;
+//   });
 
 export default function PlacePage({ route }) {
     const {
@@ -187,43 +186,32 @@ export default function PlacePage({ route }) {
             setDate(selectedTime);
         }
     };
-    
-      const handleStart = async () => {
+
+    const handleStart = async () => {
         setIsFirst(true);
         if (runningRef.current === null) {
-          runningRef.current = setInterval(() => {
-            setSeconds((prevSeconds) => {
-              if (prevSeconds === 59) {
-                setMinutes((prevMinutes) => {
-                  if (prevMinutes === 59) {
-                    setHours((prevHours) => prevHours + 1);
-                    return 0;
-                  }
-                  return prevMinutes + 1;
+            runningRef.current = BackgroundTimer.runBackgroundTimer(() => {
+                setSeconds((prevSeconds) => {
+                    if (prevSeconds === 59) {
+                        setMinutes((prevMinutes) => {
+                            if (prevMinutes === 59) {
+                                setHours((prevHours) => prevHours + 1);
+                                return 0;
+                            }
+                            return prevMinutes + 1;
+                        });
+                    }
+                    return (prevSeconds + 1) % 60;
                 });
-              }
-              return (prevSeconds + 1) % 60;
-            });
-            console.log("interval running: " )
-          }, 1000);
-          const taskRegistered = await BackgroundFetch.registerTaskAsync(BACKGROUND_TASK_NAME, {
-            minimumInterval: 60,
-            stopOnTerminate: false, // Allow the task to continue running after the app is terminated
-            startOnBoot: true, // Start the task automatically on device boot
-          });
-      
-          if (taskRegistered) {
-            console.log('Background task registered successfully.');
-          } else {
-            console.log('Failed to register background task.');
-          }
+            }, 1000);
         }
-      };
-      
-      const handleStop = () => {
+    };
+
+    const handleStop = () => {
+        BackgroundTimer.stopBackgroundTimer();
         clearInterval(runningRef.current);
         runningRef.current = null;
-      };
+    };
 
     const handleSave = () => {
         handleStop();
@@ -421,7 +409,7 @@ export default function PlacePage({ route }) {
         }
     };
 
-    const SetAlarm = () => {
+    const SetAlarm = async () => {
         let minus_time = 0;
         if (dropSelect === 0) minus_time = fastest;
         else if (dropSelect === 1) minus_time = average;
@@ -432,21 +420,35 @@ export default function PlacePage({ route }) {
             return;
         }
         if (alarmId === -1) {
+                    
+            let notificationIds = await setNotification(
+                (hour = hour),
+                (minute = minute),
+                (title = "From: " + start + " To: " + end),
+                (minus_time = minus_time)
+            );
             addAlarmItem(
                 (place_id = id),
                 (hour = hour),
                 (minute = minute),
                 (subtract = dropSelect),
-                (minus_time = minus_time)
+                (minus_time = minus_time),
+                (notificationIds = notificationIds)
             );
+
         } else {
-            // console.log(dropSelect);
             updateAlarmItem(
                 (alarm_id = alarmId),
                 (hour = hour),
                 (minute = minute),
                 (isOn = 1),
                 (subtract = dropSelect),
+                (minus_time = minus_time)
+            );
+            setNotification(
+                (hour = hour),
+                (minute = minute),
+                (title = "From: " + start + "\nTo: " + end),
                 (minus_time = minus_time)
             );
         }

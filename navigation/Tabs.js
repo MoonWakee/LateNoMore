@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { Icon } from "@rneui/themed";
 import { useState, useContext, useRef, useEffect } from "react";
+import * as Notifications from "expo-notifications";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

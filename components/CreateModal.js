@@ -2,12 +2,11 @@ import {
     FlatList,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
     Alert,
 } from "react-native";
 import React, { useRef, useContext, useState, useEffect } from "react";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView, TouchableOpacity } from "@gorhom/bottom-sheet";
 import { Easing, Keyboard } from "react-native";
 import AppContext from "../navigation/AppContext";
 import { Icon, Input } from "@rneui/base";

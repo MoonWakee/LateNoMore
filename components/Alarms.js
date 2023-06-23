@@ -41,7 +41,7 @@ export default function Alarms() {
                     hour: item.hour,
                     minute: item.minute,
                     isOn: item.isOn,
-                    subtract: item.subtract
+                    subtract: item.subtract,
                 }));
             setAlarmData(newData);
         } catch (error) {
@@ -163,6 +163,7 @@ export default function Alarms() {
                     keyExtractor={(item) => item.alarm_id}
                 />
             </View>
+            <View style={styles.bottomView} />
         </View>
     );
 }
@@ -192,5 +193,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#a8bbd6",
         borderBottomLeftRadius: 100,
         borderBottomRightRadius: 100,
+    },
+    bottomView: {
+        height: 90,
+        backgroundColor: "white",
+        // backgroundColor: "#a8bbd6",
     },
 });
