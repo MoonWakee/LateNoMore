@@ -20,10 +20,11 @@ import {
     deleteTimerItem,
     addAlarmItem,
     updateAlarmItem,
+    getAlarmNotificationIds,
 } from "../../Crud";
 import { SwipeListView } from "react-native-swipe-list-view";
 import SelectDropdown from "react-native-select-dropdown";
-import { setNotification } from "../Notification";
+import { cancelNotification, setNotification } from "../Notification";
 import * as TaskManager from "expo-task-manager";
 import * as BackgroundFetch from "expo-background-fetch";
 import BackgroundTimer from "react-native-background-timer";
@@ -356,7 +357,7 @@ export default function PlacePage({ route }) {
                     alignItems: "flex-end",
                     marginLeft: 20,
                     paddingHorizontal: 16,
-                    backgroundColor: "#FF0000",
+                    backgroundColor: "#F55451",
                 }}
             >
                 <TouchableOpacity
@@ -420,11 +421,10 @@ export default function PlacePage({ route }) {
             return;
         }
         if (alarmId === -1) {
-                    
             let notificationIds = await setNotification(
                 (hour = hour),
                 (minute = minute),
-                (title = "From: " + start + " To: " + end),
+                (title =  start + " → " + end),
                 (minus_time = minus_time)
             );
             addAlarmItem(
@@ -435,21 +435,33 @@ export default function PlacePage({ route }) {
                 (minus_time = minus_time),
                 (notificationIds = notificationIds)
             );
-
         } else {
-            updateAlarmItem(
+            
+
+            let old_notifications = await getAlarmNotificationIds(alarmId);
+            // console.log("old", old_notifications);
+            const new_data = old_notifications.substring(1, old_notifications.length - 1);
+            const new_arr = new_data.split(',');
+            
+            new_arr.forEach(async (e) => {
+                await cancelNotification(e);
+            })
+          
+            let notificationIds = await setNotification(
+                (hour = hour),
+                (minute = minute),
+                (title =  start + " → " + end),
+                (minus_time = minus_time)
+            );
+
+            const dummyWait = await updateAlarmItem(
                 (alarm_id = alarmId),
                 (hour = hour),
                 (minute = minute),
                 (isOn = 1),
                 (subtract = dropSelect),
-                (minus_time = minus_time)
-            );
-            setNotification(
-                (hour = hour),
-                (minute = minute),
-                (title = "From: " + start + "\nTo: " + end),
-                (minus_time = minus_time)
+                (minus_time = minus_time),
+                (notificationIds = notificationIds)
             );
         }
 

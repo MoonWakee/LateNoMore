@@ -8,7 +8,7 @@ export const setNotification = async (hour, minute, body, minus_time) => {
         handleNotification: async () => ({
             shouldShowAlert: true,
             shouldPlaySound: true,
-            shouldSetBadge: true,
+            shouldSetBadge: false,
         }),
     });
 
@@ -73,7 +73,7 @@ export const setNotification = async (hour, minute, body, minus_time) => {
     const scheduleLocalNotification = async (triggerTime, title, body) => {
         try {
             const { status } = await Notifications.requestPermissionsAsync();
-            console.log(status);
+            // console.log(status);
             if (status !== "granted") {
                 console.log("Permission not granted for notifications");
                 return;
@@ -100,25 +100,44 @@ export const setNotification = async (hour, minute, body, minus_time) => {
         }
     };
 
-    let arr = []
-    arr.push(scheduleLocalNotification(tenTime, title, "10 minutes before leaving!"))
-    arr.push(scheduleLocalNotification(fiveTime, title, "5 minutes before leaving!"))
-    arr.push(scheduleLocalNotification(trueTime, title, "It's time to leave! Get Out!"))
-
+    let arr = [];
+    arr.push(
+        scheduleLocalNotification(tenTime, title, "10 minutes before leaving!")
+    );
+    arr.push(
+        scheduleLocalNotification(fiveTime, title, "5 minutes before leaving!")
+    );
+    arr.push(
+        scheduleLocalNotification(
+            trueTime,
+            title,
+            "It's time to leave! Get Out!"
+        )
+    );
     try {
         const notificationIds = await Promise.all(arr);
         return notificationIds;
         // console.log("Scheduled notifications with IDs:", notificationIds);
-      } catch (error) {
+    } catch (error) {
         console.log("Error scheduling notifications:", error);
-      }
+    }
 };
 
 export const cancelNotification = async (notificationId) => {
     try {
-        await Notifications.cancelScheduledNotificationAsync(notificationId);
-        console.log("Cancelled notification with ID:", notificationId);
+        const { status } = await Notifications.requestPermissionsAsync();
+        // console.log(status);
+        if (status !== "granted") {
+            console.log("Permission not granted for notifications");
+            return;
+        }
+        // console.log(notificationId)
+
+        notificationId = notificationId.replace(/\n/g, "").trim();
+        const notification = notificationId.substring(1, notificationId.length - 1);
+        await Notifications.cancelScheduledNotificationAsync(notification);
+        // console.log("Cancelled notification with ID:", notification);
     } catch (error) {
-        console.log("Error cancelling notification:", error);
+        console.log("Error cancelling notifications:", error);
     }
 };

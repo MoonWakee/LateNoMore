@@ -9,7 +9,8 @@ import React, { useState, useContext } from "react";
 import PlaceCard from "./PlaceCard";
 import { SwipeListView } from "react-native-swipe-list-view";
 import AppContext from "../../navigation/AppContext.js";
-import { deletePlaceItem } from "../../Crud";
+import { deletePlaceItem, getAlarmNotificationIds } from "../../Crud";
+import { cancelNotification } from "../Notification";
 
 export default function PlaceList({ placeData }) {
     let [curOpened, setCurOpened] = useState(-1);
@@ -39,7 +40,7 @@ export default function PlaceList({ placeData }) {
                 <View
                     style={[
                         styles.hiddenContainer,
-                        { backgroundColor: "blue" },
+                        { backgroundColor: "#007AFF" },
                     ]}
                 >
                     <View
@@ -54,7 +55,7 @@ export default function PlaceList({ placeData }) {
                             onPress={() => rowMap[data.item.id].closeRow()}
                             style={{
                                 flex: 1,
-                                backgroundColor: "blue",
+                                backgroundColor: "#007AFF",
                                 alignItems: "center",
                                 justifyContent: "center",
                                 height:
@@ -73,7 +74,22 @@ export default function PlaceList({ placeData }) {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={() => {
+                            onPress={async () => {
+                                let old_notifications =
+                                    await getAlarmNotificationIds(
+                                        (alarm_id = curOpened) 
+                                    ); console.log('here', old_notifications)
+                                if (old_notifications.length != 3) {
+                                    const new_data =
+                                        old_notifications.substring(
+                                            1,
+                                            old_notifications.length - 1
+                                        );
+                                    const new_arr = new_data.split(",");
+                                    new_arr.forEach(async (e) => {
+                                        await cancelNotification(e);
+                                    }); 
+                                }
                                 deletePlaceItem(curOpened);
                                 setIsModified(true)
 
@@ -85,7 +101,7 @@ export default function PlaceList({ placeData }) {
                                     0.34,
                                 alignItems: "center",
                                 justifyContent: "center",
-                                backgroundColor: "red",
+                                backgroundColor: "#F55451",
                                 borderTopRightRadius: 15,
                                 borderBottomRightRadius: 15,
                             }}

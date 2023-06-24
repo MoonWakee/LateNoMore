@@ -15,10 +15,20 @@ import {
     getPlaceItem,
     deleteAlarmItem,
     updateAlarmOn,
+    getAlarmNotificationIds,
 } from "../Crud.js";
 import AppContext from "../navigation/AppContext.js";
+import { cancelNotification, setNotification } from "./Notification.js";
 
-export default function AlarmCard({ alarm_id, place_id, hour, minute, isOn, subtract }) {
+export default function AlarmCard({
+    alarm_id,
+    place_id,
+    hour,
+    minute,
+    isOn,
+    subtract,
+    minus_time,
+}) {
     const [start, setStart] = useState("");
     const [end, setEnd] = useState("");
     const [data, setData] = useState([]);
@@ -59,7 +69,7 @@ export default function AlarmCard({ alarm_id, place_id, hour, minute, isOn, subt
             end,
             fromAlarm: 1,
             initTime: [hour, minute, alarm_id],
-            subtracted: subtract
+            subtracted: subtract,
         });
         setTimeout(() => {
             setIsPressed(false);
@@ -81,19 +91,52 @@ export default function AlarmCard({ alarm_id, place_id, hour, minute, isOn, subt
         fetchPlaceItem();
     }, [place_id]);
 
-    const [timeText, setTimeText] = useState('');
+    const [timeText, setTimeText] = useState("");
 
-    useEffect(()=> {
-        if(subtract === 0)  setTimeText("- Fastest time")  
-        else if(subtract === 1)  setTimeText("- Average time")
-        else  setTimeText("- Slowest time")
-    }, [subtract])
+    useEffect(() => {
+        if (subtract === 0) setTimeText("- Fastest time");
+        else if (subtract === 1) setTimeText("- Average time");
+        else setTimeText("- Slowest time");
+    }, [subtract]);
 
     const [arr, setArr] = useState([]);
 
     const [isEnabled, setIsEnabled] = useState(!!isOn);
-    const toggleSwitch = () => {
-        updateAlarmOn((alarm_id = alarm_id), (isOn = isEnabled ? 0 : 1));
+    const toggleSwitch = async () => {
+        if (isEnabled) {
+            let old_notifications = await getAlarmNotificationIds(
+                (alarm_id = alarm_id)
+            );
+            // console.log("old", old_notifications);
+            const new_data = old_notifications.substring(
+                1,
+                old_notifications.length - 1
+            );
+            const new_arr = new_data.split(",");
+
+            new_arr.forEach(async (e) => {
+                await cancelNotification(e);
+            });
+
+            updateAlarmOn(
+                (alarm_id = alarm_id),
+                (isOn = 0),
+                (notificationIds = [])
+            );
+        } else {
+            let notificationIds = await setNotification(
+                (hour = hour),
+                (minute = minute),
+                (title = "From: " + start + " To: " + end),
+                (minus_time = minus_time)
+            );
+            updateAlarmOn(
+                (alarm_id = alarm_id),
+                (isOn = 1),
+                (notificationIds = notificationIds)
+            );
+        }
+
         setIsEnabled((previousState) => !previousState);
     };
 
@@ -254,24 +297,24 @@ export default function AlarmCard({ alarm_id, place_id, hour, minute, isOn, subt
                     handlePressIn();
                     goToPlacePage();
                 }}
-                onLongPress={() => {
-                    handlePressIn();
-                    Alert.alert("Delete Alarm?", "", [
-                        {
-                            text: "No",
-                            style: "cancel",
-                            fontSize: 30,
-                        },
-                        {
-                            text: "Yes",
-                            onPress: () => {
-                                deleteAlarmItem(id);
-                                setIsModified(true);
-                            },
-                            style: "destructive",
-                        },
-                    ]);
-                }}
+                // onLongPress={() => {
+                //     handlePressIn();
+                //     Alert.alert("Delete Alarm?", "", [
+                //         {
+                //             text: "No",
+                //             style: "cancel",
+                //             fontSize: 30,
+                //         },
+                //         {
+                //             text: "Yes",
+                //             onPress: () => {
+                //                 deleteAlarmItem(id);
+                //                 setIsModified(true);
+                //             },
+                //             style: "destructive",
+                //         },
+                //     ]);
+                // }}
                 onPressOut={handlePressOut}
             >
                 <View

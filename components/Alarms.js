@@ -8,9 +8,14 @@ import {
 } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
 import AppContext from "../navigation/AppContext";
-import { getAlarmItems, deleteAlarmItem } from "../Crud";
+import {
+    getAlarmItems,
+    deleteAlarmItem,
+    getAlarmNotificationIds,
+} from "../Crud";
 import AlarmCard from "./AlarmCard";
 import { SwipeListView } from "react-native-swipe-list-view";
+import { cancelNotification } from "./Notification";
 
 export default function Alarms() {
     const { isModified, setIsModified } = useContext(AppContext);
@@ -42,6 +47,7 @@ export default function Alarms() {
                     minute: item.minute,
                     isOn: item.isOn,
                     subtract: item.subtract,
+                    minus_time: item.minus_time,
                 }));
             setAlarmData(newData);
         } catch (error) {
@@ -62,6 +68,7 @@ export default function Alarms() {
                 minute={item.minute}
                 isOn={item.isOn}
                 subtract={item.subtract}
+                minus_time={item.minus_time}
             />
         );
     };
@@ -79,7 +86,7 @@ export default function Alarms() {
                 <View
                     style={[
                         styles.hiddenContainer,
-                        { backgroundColor: "blue" },
+                        { backgroundColor: "#007AFF" },
                     ]}
                 >
                     <View
@@ -96,7 +103,7 @@ export default function Alarms() {
                             }
                             style={{
                                 flex: 1,
-                                backgroundColor: "blue",
+                                backgroundColor: "#007AFF",
                                 alignItems: "center",
                                 justifyContent: "center",
                                 height:
@@ -115,7 +122,23 @@ export default function Alarms() {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={() => {
+                            onPress={async () => {
+                                let old_notifications =
+                                    await getAlarmNotificationIds(
+                                        (alarm_id = curOpened)
+                                    );
+                                if (old_notifications.length != 3) {
+                                    const new_data =
+                                        old_notifications.substring(
+                                            1,
+                                            old_notifications.length - 1
+                                        );
+                                    const new_arr = new_data.split(",");
+
+                                    new_arr.forEach(async (e) => {
+                                        await cancelNotification(e);
+                                    }); 
+                                }
                                 deleteAlarmItem(curOpened);
                                 setIsModified(true);
                             }}
@@ -126,7 +149,7 @@ export default function Alarms() {
                                     0.34,
                                 alignItems: "center",
                                 justifyContent: "center",
-                                backgroundColor: "red",
+                                backgroundColor: "#F55451",
                                 borderTopRightRadius: 15,
                                 borderBottomRightRadius: 15,
                             }}
@@ -150,7 +173,7 @@ export default function Alarms() {
     return (
         <View style={styles.container}>
             <View style={styles.arc} />
-            <View style={styles.container}>
+            {!isModified && <View style={styles.container}>
                 <SwipeListView
                     data={alarmData}
                     renderItem={alarmItem}
@@ -162,7 +185,7 @@ export default function Alarms() {
                     useNativeDriver={false}
                     keyExtractor={(item) => item.alarm_id}
                 />
-            </View>
+            </View>}
             <View style={styles.bottomView} />
         </View>
     );

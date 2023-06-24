@@ -173,12 +173,12 @@ export const checkIfPlaceItemExists = (start, end, data) => {
     });
 };
 
-export const addAlarmItem = (place_id, hour, minute, subtract, minus_time) => {
+export const addAlarmItem = (place_id, hour, minute, subtract, minus_time, notificationIds) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
             tx.executeSql(
-                "INSERT INTO alarm_items (place_id, hour, minute, isOn, subtract, minus_time) VALUES (?, ?, ?, 1, ?, ?)",
-                [place_id, hour, minute, subtract, minus_time],
+                "INSERT INTO alarm_items (place_id, hour, minute, isOn, subtract, minus_time, notificationIds) VALUES (?, ?, ?, 1, ?, ?, ?)",
+                [place_id, hour, minute, subtract, minus_time, notificationIds],
                 (_, result) => {
                     // Handle success
                     const lastInsertId = result.insertId;
@@ -189,7 +189,8 @@ export const addAlarmItem = (place_id, hour, minute, subtract, minus_time) => {
                         hour,
                         minute,
                         subtract,
-                        minus_time
+                        minus_time,
+                        notificationIds
                     );
                     return resolve(lastInsertId);
                 },
@@ -222,15 +223,36 @@ export const getAlarmItems = () => {
     });
 };
 
-export const updateAlarmOn = (alarm_id, isOn) => {
+export const getAlarmNotificationIds = (id) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
             tx.executeSql(
-                "UPDATE alarm_items SET isOn = ? WHERE alarm_id = ?",
-                [isOn, alarm_id],
+                "SELECT notificationIds FROM alarm_items WHERE alarm_id = ?",
+                [id],
                 (_, result) => {
                     // Handle success
-                    console.log("Alarm Toggle updated successfully");
+                    const item = result.rows._array[0];
+                    // console.log(item.notificationIds);
+                    resolve(item.notificationIds);
+                },
+                (_, error) => {
+                    // Handle error
+                    reject(error);
+                }
+            );
+        });
+    });
+};
+
+export const updateAlarmOn = (alarm_id, isOn, notificationIds) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "UPDATE alarm_items SET isOn = ?, notificationIds = ? WHERE alarm_id = ?",
+                [isOn, notificationIds, alarm_id],
+                (_, result) => {
+                    // Handle success
+                    console.log("Alarm Toggle updated successfully", isOn, notificationIds);
                 },
                 (_, error) => {
                     // Handle error
@@ -247,13 +269,14 @@ export const updateAlarmItem = (
     minute,
     isOn,
     subtract,
-    minus_time
+    minus_time,
+    notificationIds
 ) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
             tx.executeSql(
-                "UPDATE alarm_items SET hour = ?, minute = ?, isOn = ?, subtract = ?, minus_time = ? WHERE alarm_id = ?",
-                [hour, minute, isOn, subtract, minus_time, alarm_id],
+                "UPDATE alarm_items SET hour = ?, minute = ?, isOn = ?, subtract = ?, minus_time = ?, notificationIds = ? WHERE alarm_id = ?",
+                [hour, minute, isOn, subtract, minus_time, notificationIds, alarm_id],
                 (_, result) => {
                     // Handle success
                     console.log(
@@ -261,6 +284,7 @@ export const updateAlarmItem = (
                         subtract,
                         minus_time
                     );
+                    resolve(isOn);
                 },
                 (_, error) => {
                     // Handle error
@@ -271,22 +295,7 @@ export const updateAlarmItem = (
     });
 };
 
-export const updateItem = (id, text, count) => {
-    db.transaction((tx) => {
-        tx.executeSql(
-            "UPDATE items SET text = ?, count = ? WHERE id = ?",
-            [text, count, id],
-            (_, result) => {
-                // Handle success
-                console.log("Item updated successfully");
-            },
-            (_, error) => {
-                // Handle error
-                console.log("Error updating item:", error);
-            }
-        );
-    });
-};
+
 
 export const deleteTimerItem = (id) => {
     db.transaction((tx) => {
