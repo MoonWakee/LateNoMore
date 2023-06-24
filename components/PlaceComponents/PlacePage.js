@@ -21,6 +21,8 @@ import {
     addAlarmItem,
     updateAlarmItem,
     getAlarmNotificationIds,
+    getAlarmwithPlace,
+    deleteAlarmItem,
 } from "../../Crud";
 import { SwipeListView } from "react-native-swipe-list-view";
 import SelectDropdown from "react-native-select-dropdown";
@@ -174,8 +176,32 @@ export default function PlacePage({ route }) {
     };
 
     useEffect(() => {
-        if (timerData.length == 0) setHasTimer(false);
-        else setHasTimer(true);
+        if (timerData.length == 0) {
+            setHasTimer(false);
+            const for_await = async () => {
+                const items = await getAlarmwithPlace(id);
+                const newData = items.slice().map((item) => ({
+                    alarm_id: item.alarm_id,
+                }));
+                console.log(newData);
+                newData.forEach(async (nd) => {
+                        let id_from_al = nd.alarm_id;
+                        let old_notifications = await getAlarmNotificationIds(id_from_al);
+                        if (old_notifications.length != 3) {
+                            const new_data = old_notifications.substring(
+                                1,
+                                old_notifications.length - 1
+                            );
+                            const new_arr = new_data.split(",");
+                            new_arr.forEach(async (e) => {
+                                await cancelNotification(e);
+                            });
+                        }
+                        deleteAlarmItem(id_from_al);
+                });
+            };
+            for_await();
+        } else setHasTimer(true);
     }, [timerData]);
 
     const handleTimeChange = (event, selectedTime) => {
@@ -424,7 +450,7 @@ export default function PlacePage({ route }) {
             let notificationIds = await setNotification(
                 (hour = hour),
                 (minute = minute),
-                (title =  start + " → " + end),
+                (title = start + " → " + end),
                 (minus_time = minus_time)
             );
             addAlarmItem(
@@ -436,21 +462,22 @@ export default function PlacePage({ route }) {
                 (notificationIds = notificationIds)
             );
         } else {
-            
-
             let old_notifications = await getAlarmNotificationIds(alarmId);
             // console.log("old", old_notifications);
-            const new_data = old_notifications.substring(1, old_notifications.length - 1);
-            const new_arr = new_data.split(',');
-            
+            const new_data = old_notifications.substring(
+                1,
+                old_notifications.length - 1
+            );
+            const new_arr = new_data.split(",");
+
             new_arr.forEach(async (e) => {
                 await cancelNotification(e);
-            })
-          
+            });
+
             let notificationIds = await setNotification(
                 (hour = hour),
                 (minute = minute),
-                (title =  start + " → " + end),
+                (title = start + " → " + end),
                 (minus_time = minus_time)
             );
 

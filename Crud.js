@@ -223,6 +223,26 @@ export const getAlarmItems = () => {
     });
 };
 
+export const getAlarmwithPlace = (place_id) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "SELECT * FROM alarm_items WHERE place_id = ?",
+                [place_id],
+                (_, result) => {
+                    // Handle success
+                    const items = result.rows._array;
+                    resolve(items);
+                },
+                (_, error) => {
+                    // Handle error
+                    reject(error);
+                }
+            );
+        });
+    });
+};
+
 export const getAlarmNotificationIds = (id) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
