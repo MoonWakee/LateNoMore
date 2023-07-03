@@ -175,18 +175,34 @@ export default function PlacePage({ route }) {
         else return "#6CE200";
     };
 
-    useEffect(() => {
-        if (timerData.length == 0) {
-            setHasTimer(false);
-            const for_await = async () => {
-                const items = await getAlarmwithPlace(id);
-                const newData = items.slice().map((item) => ({
-                    alarm_id: item.alarm_id,
+    const fetchItems = async () => {
+        try {
+            const items = await getTimerItems(id);
+            if (items.length != 0) {
+                const newData = items.reverse().map((item) => ({
+                    timer_id: item.id,
+                    date: item.date,
+                    time: item.time,
                 }));
-                console.log(newData);
-                newData.forEach(async (nd) => {
+                setTimerData(newData);
+                setRowKey(parseInt(newData[0].timer_id));
+                console.log('wassup')
+                setHasTimer(true);
+            } else {
+                setTimerData([])
+                console.log('girl')
+                setHasTimer(false);
+                const for_await = async () => {
+                    const items = await getAlarmwithPlace(id);
+                    const newData = items.slice().map((item) => ({
+                        alarm_id: item.alarm_id,
+                    }));
+                    console.log("newdata" + newData);
+                    newData.forEach(async (nd) => {
                         let id_from_al = nd.alarm_id;
-                        let old_notifications = await getAlarmNotificationIds(id_from_al);
+                        let old_notifications = await getAlarmNotificationIds(
+                            id_from_al
+                        );
                         if (old_notifications.length != 3) {
                             const new_data = old_notifications.substring(
                                 1,
@@ -198,11 +214,18 @@ export default function PlacePage({ route }) {
                             });
                         }
                         deleteAlarmItem(id_from_al);
-                });
-            };
-            for_await();
-        } else setHasTimer(true);
-    }, [timerData]);
+                    });
+                };
+                for_await();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchItems();
+    }, [id]);
 
     const handleTimeChange = (event, selectedTime) => {
         if (selectedTime) {
@@ -420,22 +443,6 @@ export default function PlacePage({ route }) {
         // }
     };
 
-    const fetchItems = async () => {
-        try {
-            const items = await getTimerItems(id);
-
-            const newData = items.reverse().map((item) => ({
-                timer_id: item.id,
-                date: item.date,
-                time: item.time,
-            }));
-            setTimerData(newData);
-            setRowKey(parseInt(newData[0].timer_id));
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
     const SetAlarm = async () => {
         let minus_time = 0;
         if (dropSelect === 0) minus_time = fastest;
@@ -468,27 +475,28 @@ export default function PlacePage({ route }) {
                 1,
                 old_notifications.length - 1
             );
+            console.log(new_data);
             const new_arr = new_data.split(",");
-
+            console.log(new_arr);
             new_arr.forEach(async (e) => {
                 await cancelNotification(e);
             });
 
-            let notificationIds = await setNotification(
+            let new_notificationIds = await setNotification(
                 (hour = hour),
                 (minute = minute),
                 (title = start + " → " + end),
                 (minus_time = minus_time)
             );
 
-            const dummyWait = await updateAlarmItem(
+            updateAlarmItem(
                 (alarm_id = alarmId),
                 (hour = hour),
                 (minute = minute),
                 (isOn = 1),
                 (subtract = dropSelect),
                 (minus_time = minus_time),
-                (notificationIds = notificationIds)
+                (notificationIds = new_notificationIds)
             );
         }
 
