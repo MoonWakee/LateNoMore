@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "../components/Home";
-import Alarms from "../components/Alarms";
+import Alarms from "../components/AlarmComponents/Alarms";
 import PlacePage from "../components/PlaceComponents/PlacePage";
 import DummyPage from "../components/DummyPage";
 import CreateModal from "../components/CreateModal";

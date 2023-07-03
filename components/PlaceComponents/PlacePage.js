@@ -186,11 +186,9 @@ export default function PlacePage({ route }) {
                 }));
                 setTimerData(newData);
                 setRowKey(parseInt(newData[0].timer_id));
-                console.log('wassup')
                 setHasTimer(true);
             } else {
                 setTimerData([])
-                console.log('girl')
                 setHasTimer(false);
                 const for_await = async () => {
                     const items = await getAlarmwithPlace(id);

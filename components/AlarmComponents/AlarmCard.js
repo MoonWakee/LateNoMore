@@ -16,9 +16,9 @@ import {
     deleteAlarmItem,
     updateAlarmOn,
     getAlarmNotificationIds,
-} from "../Crud.js";
-import AppContext from "../navigation/AppContext.js";
-import { cancelNotification, setNotification } from "./Notification.js";
+} from "../../Crud.js";
+import AppContext from "../../navigation/AppContext.js";
+import { cancelNotification, setNotification } from "../Notification.js";
 
 export default function AlarmCard({
     alarm_id,

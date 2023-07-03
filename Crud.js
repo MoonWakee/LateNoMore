@@ -3,19 +3,75 @@ import * as SQLite from "expo-sqlite";
 const db = SQLite.openDatabase("test.db");
 
 export const initializeDatabase = () => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS place_items (id INTEGER PRIMARY KEY AUTOINCREMENT, start TEXT, end TEXT, count INT, data JSON)",
+                [],
+                () => {},
+                (_, error) => reject(error)
+            );
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS timer_items (id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, date TEXT, time TEXT)",
+                [],
+                () => {},
+                (_, error) => reject(error)
+            );
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS alarm_items (alarm_id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, hour INT, minute INT, isOn INT, subtract INT, minus_time INT, notificationIds JSON)",
+                [],
+                () => {},
+                (_, error) => reject(error)
+            );
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS on_boarding (id INTEGER PRIMARY KEY AUTOINCREMENT, existing INTEGER)",
+                // "DROP TABLE IF EXISTS on_boarding",
+                [],
+                () => resolve(),
+                (_, error) => reject(error)
+            );
+        });
+    });
+};
+
+export const setOnboard = () => {
     db.transaction((tx) => {
         tx.executeSql(
-            "CREATE TABLE IF NOT EXISTS place_items (id INTEGER PRIMARY KEY AUTOINCREMENT, start TEXT, end TEXT, count INT, data JSON)"
-            // "DROP TABLE IF EXISTS place_items"
+            "INSERT INTO on_boarding (existing) VALUES (?)",
+            [1],
+            (_, result) => {
+                // Handle success
+                const items = result.rows._array;
+            },
+            (_, error) => {
+                // Handle error
+                console.log(error);
+            }
         );
-        tx.executeSql(
-            "CREATE TABLE IF NOT EXISTS timer_items (id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, date TEXT, time TEXT)"
-            // "DROP TABLE IF EXISTS timer_items"
-        );
-        tx.executeSql(
-            "CREATE TABLE IF NOT EXISTS alarm_items (alarm_id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, hour INT, minute INT, isOn INT, subtract INT, minus_time INT, notificationIds JSON)"
-            // "DROP TABLE IF EXISTS alarm_items"
-        );
+    });
+};
+
+export const getOnboard = () => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "SELECT * FROM on_boarding",
+                [],
+                (_, result) => {
+                    // Handle success
+                    const items = result.rows._array;
+                    if (items.length === 0) {
+                        resolve(false);
+                    } else {
+                        resolve(true);
+                    }
+                },
+                (_, error) => {
+                    // Handle error
+                    reject(error);
+                }
+            );
+        });
     });
 };
 
@@ -53,13 +109,11 @@ export const getTimerItems = (place_id) => {
                 (_, result) => {
                     // Handle success
                     const items = result.rows._array;
-                    if(items.length === 0){
-                        resolve([])
+                    if (items.length === 0) {
+                        resolve([]);
                     } else {
-                        resolve(items)
+                        resolve(items);
                     }
-                    
-                    
                 },
                 (_, error) => {
                     // Handle error
@@ -256,17 +310,20 @@ export const getAlarmwithPlace = (place_id) => {
     });
 };
 
-export const getAlarmNotificationIds = (id) => {
+export const getAlarmNotificationIds = (place_id) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
             tx.executeSql(
-                "SELECT notificationIds FROM alarm_items WHERE alarm_id = ?",
-                [id],
+                "SELECT notificationIds FROM alarm_items WHERE place_id = ?",
+                [place_id],
                 (_, result) => {
                     // Handle success
-                    const item = result.rows._array[0];
-                    console.log(item.notificationIds);
-                    resolve(item.notificationIds);
+                    const item = result.rows._array;
+                    if (item.length === 0) {
+                        resolve([]);
+                    } else {
+                        resolve(item[0].notificationIds);
+                    }
                 },
                 (_, error) => {
                     // Handle error
@@ -327,7 +384,7 @@ export const updateAlarmItem = (
                     console.log(
                         "Alarm Item updated successfully: ",
                         hour,
-                        minute,
+                        minute
                         // subtract,
                         // minus_time
                     );

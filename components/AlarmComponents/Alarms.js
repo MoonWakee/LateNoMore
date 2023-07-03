@@ -7,15 +7,15 @@ import {
     TouchableOpacity,
 } from "react-native";
 import React, { useContext, useState, useEffect } from "react";
-import AppContext from "../navigation/AppContext";
+import AppContext from "../../navigation/AppContext";
 import {
     getAlarmItems,
     deleteAlarmItem,
     getAlarmNotificationIds,
-} from "../Crud";
+} from "../../Crud";
 import AlarmCard from "./AlarmCard";
 import { SwipeListView } from "react-native-swipe-list-view";
-import { cancelNotification } from "./Notification";
+import { cancelNotification } from "../Notification";
 
 export default function Alarms() {
     const { isModified, setIsModified } = useContext(AppContext);

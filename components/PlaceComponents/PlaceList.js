@@ -77,9 +77,10 @@ export default function PlaceList({ placeData }) {
                             onPress={async () => {
                                 let old_notifications =
                                     await getAlarmNotificationIds(
-                                        (alarm_id = curOpened) 
-                                    ); console.log('here', old_notifications)
-                                if (old_notifications.length != 3) {
+                                        (place_id = curOpened)
+                                    );
+                                console.log("here", old_notifications);
+                                if (old_notifications.length === 3) {
                                     const new_data =
                                         old_notifications.substring(
                                             1,
@@ -88,11 +89,10 @@ export default function PlaceList({ placeData }) {
                                     const new_arr = new_data.split(",");
                                     new_arr.forEach(async (e) => {
                                         await cancelNotification(e);
-                                    }); 
+                                    });
                                 }
                                 deletePlaceItem(curOpened);
-                                setIsModified(true)
-
+                                setIsModified(true);
                             }}
                             style={{
                                 flex: 1,
