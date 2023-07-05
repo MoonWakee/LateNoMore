@@ -18,14 +18,17 @@ import {
 import { Icon } from "@rneui/themed";
 import { useState, useContext, useRef, useEffect } from "react";
 import * as Notifications from "expo-notifications";
+import { getAlarmItems, getPlaceItems, getTimerItems, getAlarmItemsOn } from "../Crud";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const customHeaderBackButton = ({ onPress }) => {
-    const { setIsModified } = useContext(AppContext);
+    const { setIsModified, setAlarmItems } = useContext(AppContext);
 
-    const handlePress = () => {
+    const handlePress = async () => { 
+        let alarm_length = await getAlarmItemsOn();
+        setAlarmItems(alarm_length);
         setIsModified(true);
         onPress();
     };
@@ -62,8 +65,7 @@ const customCreateButton = ({ children, onPress }) => (
 );
 
 function HomeStack() {
-    const { isOpen, setIsModified, setIsOpen } = useContext(AppContext);
-
+    const { isOpen, setIsModified, setIsOpen, alarmItems, setAlarmItems } = useContext(AppContext);
     return (
         <Tab.Navigator
             screenOptions={{
@@ -183,7 +185,7 @@ function HomeStack() {
                     tabBarBadgeStyle: {
                         top: 8,
                     },
-                    tabBarBadge: 3,
+                    tabBarBadge: alarmItems === 0 ? null : alarmItems,
                     tabBarIcon: ({ focused }) => (
                         <View
                             style={[
@@ -230,10 +232,19 @@ function HomeStack() {
 export default function Tabs() {
     const [isOpen, setIsOpen] = useState(false);
     const [isModified, setIsModified] = useState(true);
+    const [alarmItems, setAlarmItems] = useState(0);
+
+    useEffect(() => {
+        const get_alarm = async() => {
+            const alarm_length = await getAlarmItemsOn();
+            setAlarmItems(alarm_length);
+        }
+        get_alarm();
+    }, [])
 
     return (
         <AppContext.Provider
-            value={{ isOpen, setIsOpen, isModified, setIsModified }}
+            value={{ isOpen, setIsOpen, isModified, setIsModified, alarmItems, setAlarmItems }}
         >
             <SafeAreaView
                 style={{

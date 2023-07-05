@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import OnboardPage from "../components/OnboardPage";
 import Onboarding from "react-native-onboarding-swiper";
 import { setOnboard } from "../Crud.js";
+import * as Notifications from "expo-notifications";
 
 const Stack = createStackNavigator();
 
@@ -18,9 +18,12 @@ export default function OnboardStack({onboardingDone}) {
             {() => <Onboarding
             showSkip={false}
             bottomBarHighlight={false}
+            titleStyles={{fontSize: 30}}
+            subTitleStyles={{fontSize: 20}}
             onDone={() => {
                 onboardingDone()
                 setOnboard();
+                Notifications.requestPermissionsAsync();
             }}
             pages={[
                 {
@@ -32,7 +35,7 @@ export default function OnboardStack({onboardingDone}) {
                                 width: Dimensions.get("screen").width - 50,
                                 height: 220,
                             }}
-                            source={require("../resources/getout_logo_copy.png")}
+                            source={require("../resources/getout_logo.png")}
                         />
                     ),
                     title: "Are you a Latecomer?",
@@ -72,7 +75,7 @@ export default function OnboardStack({onboardingDone}) {
                         "Time how long it takes to commute! \n\n\nTime the first commute time to use the alarm\n\n Timer runs on your background no need to leave open!",
                 },
                 {
-                    backgroundColor: "#9c57c2",
+                    backgroundColor: "#5284DA",
                     image: (
                         <Image
                             resizeMode="contain"
@@ -85,7 +88,7 @@ export default function OnboardStack({onboardingDone}) {
                     ),
                     title: "Set Alarm",
                     subtitle:
-                        "Set the time you wish to arrive at destination! \n\n1. Pick time, will repeat daily\n\n 2. Select the commuting time you want to subtract\n i.e) the ETA you want to use!",
+                        "Set the time you wish to arrive at destination! \n\n1. Pick time, will repeat daily until turned off\n\n 2. Select commuting time to subtract\n i.e) the ETA you want to use!",
                 },
                 {
                     backgroundColor: "#1B6E8B",
@@ -99,9 +102,24 @@ export default function OnboardStack({onboardingDone}) {
                             source={require("../resources/alarm_card.png")}
                         />
                     ),
+                    title: "No need to check time!",
+                    subtitle: "I will let you know \n\nbefore 10 mins, \n\nbefore 5 mins \n\nand the time to Get Out!",
+                },
+                {
+                    backgroundColor: "#d98310",
+                    image: (
+                        <Image
+                            resizeMode="contain"
+                            style={{
+                                width: Dimensions.get("screen").width - 50,
+                                height: 220,
+                            }}
+                            source={require("../resources/getout_logo.png")}
+                        />
+                    ),
                     title: "Ready to become an early bird?",
                     subtitle:
-                        "Remember to start the timer when you leave!\n\n\nAlarms can be toggled on and off\n\nYour routes, measured times, alarms\ncan be deleted by swiping left!",
+                        "Alarms can be toggled on and off\n\nYour routes, measured times, alarms\ncan be deleted by swiping left!\n\nRemember to start the timer when you leave!",
                 },
             ]}
         />}

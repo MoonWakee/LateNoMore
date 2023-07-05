@@ -16,6 +16,7 @@ import {
     deleteAlarmItem,
     updateAlarmOn,
     getAlarmNotificationIds,
+    getAlarmItemsOn,
 } from "../../Crud.js";
 import AppContext from "../../navigation/AppContext.js";
 import { cancelNotification, setNotification } from "../Notification.js";
@@ -100,14 +101,15 @@ export default function AlarmCard({
     }, [subtract]);
 
     const [arr, setArr] = useState([]);
-
     const [isEnabled, setIsEnabled] = useState(!!isOn);
+    const { setAlarmItems } = useContext(AppContext);
+
+
     const toggleSwitch = async () => {
         if (isEnabled) {
             let old_notifications = await getAlarmNotificationIds(
                 (alarm_id = alarm_id)
             );
-            // console.log("old", old_notifications);
             const new_data = old_notifications.substring(
                 1,
                 old_notifications.length - 1
@@ -130,14 +132,16 @@ export default function AlarmCard({
                 (title = "From: " + start + " To: " + end),
                 (minus_time = minus_time)
             );
+            console.log("here")
             updateAlarmOn(
                 (alarm_id = alarm_id),
                 (isOn = 1),
                 (notificationIds = notificationIds)
             );
         }
-
         setIsEnabled((previousState) => !previousState);
+        let alarm_length = await getAlarmItemsOn(); 
+        setAlarmItems(alarm_length);
     };
 
     const iconSettler = (data) => {
@@ -287,7 +291,6 @@ export default function AlarmCard({
         setIsPressed(false);
     };
 
-    const { isModified, setIsModified } = useContext(AppContext);
 
     return (
         // <></>

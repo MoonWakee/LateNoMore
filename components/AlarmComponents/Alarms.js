@@ -12,13 +12,14 @@ import {
     getAlarmItems,
     deleteAlarmItem,
     getAlarmNotificationIds,
+    getAlarmItemsOn,
 } from "../../Crud";
 import AlarmCard from "./AlarmCard";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { cancelNotification } from "../Notification";
 
 export default function Alarms() {
-    const { isModified, setIsModified } = useContext(AppContext);
+    const { isModified, setIsModified, setAlarmItems } = useContext(AppContext);
     let [curOpened, setCurOpened] = useState(-1);
     const [alarmData, setAlarmData] = useState([]);
 
@@ -137,10 +138,13 @@ export default function Alarms() {
 
                                     new_arr.forEach(async (e) => {
                                         await cancelNotification(e);
-                                    }); 
+                                    });
                                 }
                                 deleteAlarmItem(curOpened);
                                 setIsModified(true);
+
+                                let alarm_length = await getAlarmItemsOn();
+                                setAlarmItems(alarm_length);
                             }}
                             style={{
                                 flex: 1,
@@ -173,19 +177,21 @@ export default function Alarms() {
     return (
         <View style={styles.container}>
             <View style={styles.arc} />
-            {!isModified && <View style={styles.container}>
-                <SwipeListView
-                    data={alarmData}
-                    renderItem={alarmItem}
-                    numColumns={1}
-                    rightOpenValue={-175}
-                    disableRightSwipe
-                    renderHiddenItem={HiddenItem}
-                    onSwipeValueChange={handleSwipeValueChange}
-                    useNativeDriver={false}
-                    keyExtractor={(item) => item.alarm_id}
-                />
-            </View>}
+            {!isModified && (
+                <View style={styles.container}>
+                    <SwipeListView
+                        data={alarmData}
+                        renderItem={alarmItem}
+                        numColumns={1}
+                        rightOpenValue={-175}
+                        disableRightSwipe
+                        renderHiddenItem={HiddenItem}
+                        onSwipeValueChange={handleSwipeValueChange}
+                        useNativeDriver={false}
+                        keyExtractor={(item) => item.alarm_id}
+                    />
+                </View>
+            )}
             <View style={styles.bottomView} />
         </View>
     );

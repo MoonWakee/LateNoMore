@@ -7,18 +7,23 @@ export const initializeDatabase = () => {
         db.transaction((tx) => {
             tx.executeSql(
                 "CREATE TABLE IF NOT EXISTS place_items (id INTEGER PRIMARY KEY AUTOINCREMENT, start TEXT, end TEXT, count INT, data JSON)",
+                // "DROP TABLE IF EXISTS place_items",
+
                 [],
                 () => {},
                 (_, error) => reject(error)
             );
             tx.executeSql(
                 "CREATE TABLE IF NOT EXISTS timer_items (id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, date TEXT, time TEXT)",
+                // "DROP TABLE IF EXISTS timer_items",
+
                 [],
                 () => {},
                 (_, error) => reject(error)
             );
             tx.executeSql(
                 "CREATE TABLE IF NOT EXISTS alarm_items (alarm_id INTEGER PRIMARY KEY AUTOINCREMENT, place_id INTEGER, hour INT, minute INT, isOn INT, subtract INT, minus_time INT, notificationIds JSON)",
+                // "DROP TABLE IF EXISTS alarm_items",
                 [],
                 () => {},
                 (_, error) => reject(error)
@@ -30,7 +35,74 @@ export const initializeDatabase = () => {
                 () => resolve(),
                 (_, error) => reject(error)
             );
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS running (id INTEGER PRIMARY KEY AUTOINCREMENT, date INTEGER)",
+                // "DROP TABLE IF EXISTS running",
+                [],
+                () => resolve(),
+                (_, error) => reject(error)
+            );
         });
+    });
+};
+
+export const addRunning = (date) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "INSERT INTO running (date) VALUES (?)",
+            [date],
+            (_, result) => {
+                // Handle success
+                // console.log(date)
+                const items = result.rows._array;
+            },
+            (_, error) => {
+                // Handle error
+                console.log(error);
+            }
+        );
+    });
+};
+
+export const getRunningItems = () => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "SELECT * FROM running",
+                [],
+                (_, result) => {
+                    // Handle success
+                    const items = result.rows._array;
+                    if (items.length > 0){
+                        resolve(items);
+                    } else {
+                        resolve([])
+                    }
+                    
+                },
+                (_, error) => {
+                    // Handle error
+                    reject(error);
+                }
+            );
+        });
+    });
+};
+
+export const deleteRunningItem = (id) => {
+    db.transaction((tx) => {
+        tx.executeSql(
+            "DELETE FROM running",
+            [id],
+            (_, result) => {
+                // Handle success
+                console.log("Item deleted successfully");
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error deleting item:", error);
+            }
+        );
     });
 };
 
@@ -290,6 +362,26 @@ export const getAlarmItems = () => {
     });
 };
 
+export const getAlarmItemsOn = () => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "SELECT * FROM alarm_items WHERE isOn = ?",
+                [1],
+                (_, result) => {
+                    // Handle success
+                    const items = result.rows._array;
+                    resolve(items.length);
+                },
+                (_, error) => {
+                    // Handle error
+                    reject("is it this?", error);
+                }
+            );
+        });
+    });
+};
+
 export const getAlarmwithPlace = (place_id) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
@@ -310,16 +402,16 @@ export const getAlarmwithPlace = (place_id) => {
     });
 };
 
-export const getAlarmNotificationIds = (place_id) => {
+export const getAlarmNotificationIds = (alarm_id) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
             tx.executeSql(
-                "SELECT notificationIds FROM alarm_items WHERE place_id = ?",
-                [place_id],
+                "SELECT notificationIds FROM alarm_items WHERE alarm_id = ?",
+                [alarm_id],
                 (_, result) => {
                     // Handle success
                     const item = result.rows._array;
-                    if (item.length === 0) {
+                    if (item.length == 0) {
                         resolve([]);
                     } else {
                         resolve(item[0].notificationIds);
@@ -335,25 +427,23 @@ export const getAlarmNotificationIds = (place_id) => {
 };
 
 export const updateAlarmOn = (alarm_id, isOn, notificationIds) => {
-    return new Promise((resolve, reject) => {
-        db.transaction((tx) => {
-            tx.executeSql(
-                "UPDATE alarm_items SET isOn = ?, notificationIds = ? WHERE alarm_id = ?",
-                [isOn, notificationIds, alarm_id],
-                (_, result) => {
-                    // Handle success
-                    console.log(
-                        "Alarm Toggle updated successfully",
-                        isOn,
-                        notificationIds
-                    );
-                },
-                (_, error) => {
-                    // Handle error
-                    console.log("Error updating Alarm Toggle:", error);
-                }
-            );
-        });
+    db.transaction((tx) => {
+        tx.executeSql(
+            "UPDATE alarm_items SET isOn = ?, notificationIds = ? WHERE alarm_id = ?",
+            [isOn, notificationIds, alarm_id],
+            (_, result) => {
+                // Handle success
+                console.log(
+                    "Alarm Toggle updated successfully",
+                    isOn,
+                    notificationIds
+                );
+            },
+            (_, error) => {
+                // Handle error
+                console.log("Error updating Alarm Toggle:", error);
+            }
+        );
     });
 };
 
@@ -393,6 +483,7 @@ export const updateAlarmItem = (
                 (_, error) => {
                     // Handle error
                     console.log("Error updating Alarm item:", error);
+                    resolve("YO", error)
                 }
             );
         });
@@ -475,23 +566,6 @@ export const deleteAlarmItem = (id) => {
             (_, error) => {
                 // Handle error
                 console.log("Error deleting Timer item:", error);
-            }
-        );
-    });
-};
-
-export const deleteItem = (id) => {
-    db.transaction((tx) => {
-        tx.executeSql(
-            "DELETE FROM items WHERE id = ?",
-            [id],
-            (_, result) => {
-                // Handle success
-                console.log("Item deleted successfully");
-            },
-            (_, error) => {
-                // Handle error
-                console.log("Error deleting item:", error);
             }
         );
     });

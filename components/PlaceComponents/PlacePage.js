@@ -8,6 +8,7 @@ import {
     Dimensions,
     TouchableOpacity,
     Alert,
+    AppState,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AppContext from "../../navigation/AppContext";
@@ -23,30 +24,15 @@ import {
     getAlarmNotificationIds,
     getAlarmwithPlace,
     deleteAlarmItem,
+    getAlarmItemsOn,
+    addRunning,
+    getRunningItems,
+    deleteRunningItem,
 } from "../../Crud";
 import { SwipeListView } from "react-native-swipe-list-view";
 import SelectDropdown from "react-native-select-dropdown";
 import { cancelNotification, setNotification } from "../Notification";
-import * as TaskManager from "expo-task-manager";
-import * as BackgroundFetch from "expo-background-fetch";
 import BackgroundTimer from "react-native-background-timer";
-
-// const BACKGROUND_TASK_NAME = 'backgroundCounter';
-
-// TaskManager.defineTask(BACKGROUND_TASK_NAME, async ({ data, error }) => {
-//     if (error) {
-//       console.error('An error occurred in the background task:', error);
-//       return BackgroundFetch.Result.Failed;
-//     }
-
-//     console.log('What is happening now');
-//     // Update your timer state here
-//     // For example:
-//     setSeconds((prevSeconds) => prevSeconds + 1);
-
-//     // Return BackgroundFetch.Result.NewData to indicate success
-//     return BackgroundFetch.Result.NewData;
-//   });
 
 export default function PlacePage({ route }) {
     const {
@@ -136,7 +122,7 @@ export default function PlacePage({ route }) {
         setFastest(Math.min(...timerData.map((item) => parseFloat(item.time))));
     }, [timerData]);
 
-    const { isModified, setIsModified } = useContext(AppContext);
+    const { isModified, setIsModified, setAlarmItems } = useContext(AppContext);
 
     const subtractText = (sec) => {
         let hour = 0,
@@ -188,14 +174,13 @@ export default function PlacePage({ route }) {
                 setRowKey(parseInt(newData[0].timer_id));
                 setHasTimer(true);
             } else {
-                setTimerData([])
+                setTimerData([]);
                 setHasTimer(false);
                 const for_await = async () => {
                     const items = await getAlarmwithPlace(id);
                     const newData = items.slice().map((item) => ({
                         alarm_id: item.alarm_id,
                     }));
-                    console.log("newdata" + newData);
                     newData.forEach(async (nd) => {
                         let id_from_al = nd.alarm_id;
                         let old_notifications = await getAlarmNotificationIds(
@@ -235,10 +220,47 @@ export default function PlacePage({ route }) {
         }
     };
 
+    useEffect(() => {
+        AppState.addEventListener("change", handleAppStateChange);
+
+        return () => {
+            AppState.removeEventListener("change", handleAppStateChange);
+        };
+    }, []);
+
+    const handleAppStateChange = (nextAppState) => {
+        if (nextAppState === "active") {
+            // App became active from background with startTime recorded
+            let runningItem = async () => {
+                let startItem = await getRunningItems();
+
+                if (startItem.length === 0) {
+                    // if there is no startDate.getTime() in the DB do nothing
+                    return;
+                } else {
+                    // if back from background and the timer needs to be running
+                    let startTime = startItem[0].date;
+                    let endTime = new Date().getTime();
+                    let diff = Math.floor((endTime - startTime) / 1000);
+                    setSeconds((prevSeconds) => prevSeconds + diff);
+                    handleStart();
+                    deleteRunningItem();
+                }
+            };
+            runningItem();
+        } else if (nextAppState === "background" && runningRef.current) {
+            // App moved to the background while running timer
+            console.log("background");
+            handleStop();
+            addRunning(new Date().getTime());
+        }
+    };
+
     const handleStart = async () => {
         setIsFirst(true);
         if (runningRef.current === null) {
-            runningRef.current = BackgroundTimer.runBackgroundTimer(() => {
+            BackgroundTimer.start();
+            runningRef.current = setInterval(() => {
                 setSeconds((prevSeconds) => {
                     if (prevSeconds === 59) {
                         setMinutes((prevMinutes) => {
@@ -256,7 +278,7 @@ export default function PlacePage({ route }) {
     };
 
     const handleStop = () => {
-        BackgroundTimer.stopBackgroundTimer();
+        BackgroundTimer.stop();
         clearInterval(runningRef.current);
         runningRef.current = null;
     };
@@ -497,6 +519,8 @@ export default function PlacePage({ route }) {
                 (notificationIds = new_notificationIds)
             );
         }
+        let alarm_length = await getAlarmItemsOn();
+        setAlarmItems(alarm_length);
 
         setIsModified(true);
         navigation.navigate("Alarms");

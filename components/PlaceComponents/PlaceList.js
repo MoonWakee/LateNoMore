@@ -9,12 +9,12 @@ import React, { useState, useContext } from "react";
 import PlaceCard from "./PlaceCard";
 import { SwipeListView } from "react-native-swipe-list-view";
 import AppContext from "../../navigation/AppContext.js";
-import { deletePlaceItem, getAlarmNotificationIds } from "../../Crud";
+import { deletePlaceItem, getAlarmItemsOn, getAlarmNotificationIds } from "../../Crud";
 import { cancelNotification } from "../Notification";
 
 export default function PlaceList({ placeData }) {
     let [curOpened, setCurOpened] = useState(-1);
-    const { isModified, setIsModified } = useContext(AppContext);
+    const { isModified, setIsModified, setAlarmItems } = useContext(AppContext);
 
     const placeItem = ({ item }) => {
         return (
@@ -92,6 +92,8 @@ export default function PlaceList({ placeData }) {
                                     });
                                 }
                                 deletePlaceItem(curOpened);
+                                let alarm_length = await getAlarmItemsOn(); 
+                                setAlarmItems(alarm_length); 
                                 setIsModified(true);
                             }}
                             style={{
