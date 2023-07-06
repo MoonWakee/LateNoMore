@@ -242,7 +242,27 @@ export default function PlacePage({ route }) {
                     let startTime = startItem[0].date;
                     let endTime = new Date().getTime();
                     let diff = Math.floor((endTime - startTime) / 1000);
-                    setSeconds((prevSeconds) => prevSeconds + diff);
+
+                    setSeconds((prevSeconds) => {
+                        let trueSeconds = prevSeconds + diff;
+                        let updatedMinutes = minutes;
+                        let updatedHours = hours;
+
+                        if (trueSeconds >= 60) {
+                            updatedMinutes += Math.floor(trueSeconds / 60);
+                            trueSeconds %= 60;
+                        }
+
+                        if (updatedMinutes >= 60) {
+                            updatedHours += Math.floor(updatedMinutes / 60);
+                            updatedMinutes %= 60;
+                        }
+
+                        setMinutes(updatedMinutes);
+                        setHours(updatedHours);
+
+                        return (trueSeconds + 1) % 60;
+                    });
                     handleStart();
                     deleteRunningItem();
                 }
@@ -262,9 +282,9 @@ export default function PlacePage({ route }) {
             BackgroundTimer.start();
             runningRef.current = setInterval(() => {
                 setSeconds((prevSeconds) => {
-                    if (prevSeconds === 59) {
+                    if (prevSeconds >= 59) {
                         setMinutes((prevMinutes) => {
-                            if (prevMinutes === 59) {
+                            if (prevMinutes >= 59) {
                                 setHours((prevHours) => prevHours + 1);
                                 return 0;
                             }

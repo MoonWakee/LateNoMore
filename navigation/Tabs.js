@@ -94,7 +94,7 @@ function HomeStack() {
                     },
                 })}
                 options={{
-                    headerTitle: "Get Out",
+                    headerTitle: "LateNoMore",
                     headerTintColor: "white",
                     headerTitleStyle: {
                         fontWeight: 700,
