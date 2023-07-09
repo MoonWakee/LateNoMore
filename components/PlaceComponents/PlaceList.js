@@ -11,10 +11,13 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import AppContext from "../../navigation/AppContext.js";
 import { deletePlaceItem, getAlarmItemsOn, getAlarmNotificationIds } from "../../Crud";
 import { cancelNotification } from "../Notification";
+import ko from "../../locales/ko";
+import en from "../../locales/en";
 
 export default function PlaceList({ placeData }) {
     let [curOpened, setCurOpened] = useState(-1);
     const { isModified, setIsModified, setAlarmItems } = useContext(AppContext);
+    const translations = global.appLanguage === "ko" ? ko : en;
 
     const placeItem = ({ item }) => {
         return (
@@ -70,7 +73,7 @@ export default function PlaceList({ placeData }) {
                                     fontWeight: "bold",
                                 }}
                             >
-                                Cancel
+                                {translations.swipe_cancel}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -115,7 +118,7 @@ export default function PlaceList({ placeData }) {
                                     fontWeight: "bold",
                                 }}
                             >
-                                Delete
+                                {translations.swipe_delete}
                             </Text>
                         </TouchableOpacity>
                     </View>

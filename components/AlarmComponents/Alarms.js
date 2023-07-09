@@ -17,9 +17,13 @@ import {
 import AlarmCard from "./AlarmCard";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { cancelNotification } from "../Notification";
+import ko from "../../locales/ko";
+import en from "../../locales/en";
 
 export default function Alarms() {
     const { isModified, setIsModified, setAlarmItems } = useContext(AppContext);
+    const translations = global.appLanguage === "ko" ? ko : en;
+
     let [curOpened, setCurOpened] = useState(-1);
     const [alarmData, setAlarmData] = useState([]);
 
@@ -119,7 +123,7 @@ export default function Alarms() {
                                     fontWeight: "bold",
                                 }}
                             >
-                                Cancel
+                                {translations.swipe_cancel}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -165,7 +169,7 @@ export default function Alarms() {
                                     fontWeight: "bold",
                                 }}
                             >
-                                Delete
+                                {translations.swipe_delete}
                             </Text>
                         </TouchableOpacity>
                     </View>

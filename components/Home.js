@@ -13,6 +13,9 @@ import PlaceList from "./PlaceComponents/PlaceList";
 import { useNavigation } from "@react-navigation/native";
 import AppContext from "../navigation/AppContext";
 import { getPlaceItems } from "../Crud";
+import en from '../locales/en.js';
+import ko from '../locales/ko.js';
+
 
 export default function Home() {
     const searchBarOS = Platform.OS === "ios" ? "ios" : "Android";
@@ -24,6 +27,8 @@ export default function Home() {
     const updateSearch2 = (search2) => {
         setSearch2(search2);
     };
+
+    const translations = global.appLanguage === 'ko' ? ko : en;
 
     const { isModified, setIsModified } = useContext(AppContext);
 
@@ -89,7 +94,7 @@ export default function Home() {
                             //   }}
                             style={styles.searchBarStyle}
                             platform={searchBarOS}
-                            placeholder="Where you at?"
+                            placeholder={translations.home_where_you_at}
                             onChangeText={updateSearch1}
                             value={search1}
                             searchIcon={{
@@ -106,7 +111,7 @@ export default function Home() {
                             inputContainerStyle={{ backgroundColor: "white" }}
                             style={styles.searchBarStyle}
                             platform={searchBarOS}
-                            placeholder="Where to?"
+                            placeholder={translations.home_where_to}
                             onChangeText={updateSearch2}
                             value={search2}
                             searchIcon={{

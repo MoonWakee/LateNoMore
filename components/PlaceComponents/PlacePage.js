@@ -33,6 +33,8 @@ import { SwipeListView } from "react-native-swipe-list-view";
 import SelectDropdown from "react-native-select-dropdown";
 import { cancelNotification, setNotification } from "../Notification";
 import BackgroundTimer from "react-native-background-timer";
+import ko from "../../locales/ko";
+import en from "../../locales/en";
 
 export default function PlacePage({ route }) {
     const {
@@ -124,6 +126,8 @@ export default function PlacePage({ route }) {
 
     const { isModified, setIsModified, setAlarmItems } = useContext(AppContext);
 
+
+
     const subtractText = (sec) => {
         let hour = 0,
             minute = 0,
@@ -141,19 +145,19 @@ export default function PlacePage({ route }) {
         let texter = "";
 
         if (hour > 0) {
-            texter += ` ${hour} hr`;
+            texter += ' ' + hour + ' ' + translations.sub_hr;
         }
         if (minute > 0) {
-            texter += ` ${minute} min`;
+            texter += ' ' + min + ' ' + translations.sub_min;
         }
-        texter += ` ${second} sec`;
+        texter += ' ' + sec + ' ' + translations.sub_sec;
 
         return texter;
     };
 
     const handleStartText = () => {
-        if (isRunning) return "Pause";
-        else return isFirst ? "Resume" : "Start";
+        if (isRunning) return translations.timer_pause;
+        else return isFirst ? translations.timer_resue : translations.timer_start;
     };
 
     const handleStartColor = () => {
@@ -434,6 +438,8 @@ export default function PlacePage({ route }) {
     };
 
     const HiddenItem = () => {
+        const translations = global.appLanguage === "ko" ? ko : en;
+
         return (
             <View
                 style={{
@@ -463,7 +469,7 @@ export default function PlacePage({ route }) {
                             fontWeight: "bold",
                         }}
                     >
-                        Delete
+                        {translations.swipe_delete}
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -490,7 +496,7 @@ export default function PlacePage({ route }) {
         else minus_time = slowest;
 
         if (dropSelect === -1) {
-            Alert.alert("Select the subtracting time!", "");
+            Alert.alert(translations.alarm_alert, "");
             return;
         }
         if (alarmId === -1) {
@@ -549,6 +555,9 @@ export default function PlacePage({ route }) {
     const dropDownRenderer = () => {
         return <Icon type="font-awesome" name="caret-down" marginRight={5} />;
     };
+
+    const translations = global.appLanguage === "ko" ? ko : en;
+
 
     return (
         <View style={styles.container}>
@@ -659,8 +668,8 @@ export default function PlacePage({ route }) {
                         textStyle={{ fontWeight: "bold" }}
                         selectedTextStyle={{ fontWeight: "bold" }}
                         options={[
-                            { label: "Timer", value: 0 },
-                            { label: "Alarm", value: 1 },
+                            { label: translations.place_timer, value: 0 },
+                            { label: translations.place_alarm, value: 1 },
                         ]}
                     />
                 </View>
@@ -686,14 +695,14 @@ export default function PlacePage({ route }) {
                                     }}
                                     rowStyle={{ backgroundColor: "#e6e6e6" }}
                                     data={[
-                                        "- Fastest time :" +
+                                        translations.alarm_fastest +
                                             subtractText(fastest),
-                                        "- Average time :" +
+                                        translations.alarm_average +
                                             subtractText(average),
-                                        "- Slowest time :" +
+                                        translations.alarm_slowest +
                                             subtractText(slowest),
                                     ]}
-                                    defaultButtonText="Select the subtracting time"
+                                    defaultButtonText= {translations.alarm_select_time}
                                     onSelect={(selectedItem, index) => {
                                         setDropSelect(index);
                                     }}
@@ -712,7 +721,7 @@ export default function PlacePage({ route }) {
                                 onPress={SetAlarm}
                                 disabled={!hasTimer}
                             >
-                                Set Alarm
+                                {translations.alarm_set_alarm}
                             </Button>
                         </>
                     )}
@@ -857,7 +866,7 @@ export default function PlacePage({ route }) {
                                     onPress={handleSave}
                                     disabled={isFirst ? false : true}
                                 >
-                                    Save
+                                    {translations.timer_save}
                                 </Button>
                             </View>
                         </>

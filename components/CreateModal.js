@@ -12,6 +12,8 @@ import AppContext from "../navigation/AppContext";
 import { Icon, Input } from "@rneui/base";
 import { addPlaceItem, getPlaceItems, checkIfPlaceItemExists } from "../Crud";
 import { useNavigation } from "@react-navigation/native";
+import en from "../locales/en.js";
+import ko from "../locales/ko.js";
 
 export default function CreateModal() {
     const sheetRef = useRef(null);
@@ -19,6 +21,8 @@ export default function CreateModal() {
     const { setIsOpen, setIsModified } = useContext(AppContext);
     const [input1, setInput1] = useState("");
     const [input2, setInput2] = useState("");
+    const translations = global.appLanguage === "ko" ? ko : en;
+
 
     const [keyboardStatus, setKeyboardStatus] = useState(false);
 
@@ -92,9 +96,9 @@ export default function CreateModal() {
         });
 
         if (input1.trim() == "" && input2.trim() == "") {
-            Alert.alert("", "Enter Location and Destination!");
+            Alert.alert("", translations.modal_alert_locations);
         } else if (transports.length == 0) {
-            Alert.alert("", "Select at least one transportation!");
+            Alert.alert("", translations.modal_alert_transportation);
         } else {
             if (
                 checkIfPlaceItemExists(
@@ -157,7 +161,7 @@ export default function CreateModal() {
                             color: "white",
                         }}
                         leftIconContainerStyle={{ marginRight: 10 }}
-                        placeholder="Enter current location..."
+                        placeholder={translations.modal_enter_current}
                         placeholderTextColor={"white"}
                         inputStyle={{ color: "white" }}
                     ></Input>
@@ -172,7 +176,7 @@ export default function CreateModal() {
                             color: "white",
                         }}
                         leftIconContainerStyle={{ marginRight: 10 }}
-                        placeholder="Enter destination..."
+                        placeholder={translations.modal_enter_destination}
                         inputStyle={{ color: "white" }}
                         placeholderTextColor={"white"}
                     ></Input>
@@ -186,7 +190,7 @@ export default function CreateModal() {
                             fontWeight: "600",
                         }}
                     >
-                        Select the transportations used to commute
+                        {translations.modal_select_transportation}
                     </Text>
                     <FlatList
                         data={transportData}
@@ -207,7 +211,7 @@ export default function CreateModal() {
                             fontSize: 18,
                         }}
                     >
-                        Create
+                        {translations.modal_create}
                     </Text>
                 </TouchableOpacity>
             </BottomSheetView>

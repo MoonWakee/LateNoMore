@@ -18,7 +18,14 @@ import {
 import { Icon } from "@rneui/themed";
 import { useState, useContext, useRef, useEffect } from "react";
 import * as Notifications from "expo-notifications";
-import { getAlarmItems, getPlaceItems, getTimerItems, getAlarmItemsOn } from "../Crud";
+import {
+    getAlarmItems,
+    getPlaceItems,
+    getTimerItems,
+    getAlarmItemsOn,
+} from "../Crud";
+import en from "../locales/en.js";
+import ko from "../locales/ko.js";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,7 +33,7 @@ const Tab = createBottomTabNavigator();
 const customHeaderBackButton = ({ onPress }) => {
     const { setIsModified, setAlarmItems } = useContext(AppContext);
 
-    const handlePress = async () => { 
+    const handlePress = async () => {
         let alarm_length = await getAlarmItemsOn();
         setAlarmItems(alarm_length);
         setIsModified(true);
@@ -34,7 +41,12 @@ const customHeaderBackButton = ({ onPress }) => {
     };
     return (
         <TouchableOpacity onPress={handlePress} style={{ marginLeft: 24 }}>
-            <Icon type='ionicon' name="arrow-back-circle" size={35} color='white'/>
+            <Icon
+                type="ionicon"
+                name="arrow-back-circle"
+                size={35}
+                color="white"
+            />
         </TouchableOpacity>
     );
 };
@@ -65,7 +77,9 @@ const customCreateButton = ({ children, onPress }) => (
 );
 
 function HomeStack() {
-    const { isOpen, setIsModified, setIsOpen, alarmItems, setAlarmItems } = useContext(AppContext);
+    const translations = global.appLanguage === "ko" ? ko : en;
+    const { isOpen, setIsModified, setIsOpen, alarmItems, setAlarmItems } =
+        useContext(AppContext);
     return (
         <Tab.Navigator
             screenOptions={{
@@ -125,7 +139,7 @@ function HomeStack() {
                                     color: focused ? "white" : "#e6e6e6",
                                 }}
                             >
-                                Home
+                                {translations.tab_bar_home}
                             </Text>
                             {focused && (
                                 <View
@@ -174,7 +188,7 @@ function HomeStack() {
                 })}
                 component={Alarms}
                 options={{
-                    headerTitle: "Alarms",
+                    headerTitle: translations.tab_bar_alarm,
                     headerTintColor: "white",
                     headerTitleStyle: {
                         fontWeight: 700,
@@ -209,7 +223,7 @@ function HomeStack() {
                                     color: focused ? "white" : "#e6e6e6",
                                 }}
                             >
-                                Alarms
+                                {translations.tab_bar_alarm}
                             </Text>
                             {focused && (
                                 <View
@@ -235,16 +249,23 @@ export default function Tabs() {
     const [alarmItems, setAlarmItems] = useState(0);
 
     useEffect(() => {
-        const get_alarm = async() => {
+        const get_alarm = async () => {
             const alarm_length = await getAlarmItemsOn();
             setAlarmItems(alarm_length);
-        }
+        };
         get_alarm();
-    }, [])
+    }, []);
 
     return (
         <AppContext.Provider
-            value={{ isOpen, setIsOpen, isModified, setIsModified, alarmItems, setAlarmItems }}
+            value={{
+                isOpen,
+                setIsOpen,
+                isModified,
+                setIsModified,
+                alarmItems,
+                setAlarmItems,
+            }}
         >
             <SafeAreaView
                 style={{
@@ -262,7 +283,6 @@ export default function Tabs() {
                             backgroundColor: "#a8bbd6",
                         },
                         headerLeft: customHeaderBackButton,
-                        
                     }}
                 >
                     <Stack.Screen
@@ -273,7 +293,14 @@ export default function Tabs() {
                             headerShown: false,
                         }}
                     />
-                    <Stack.Screen name="PlacePage" component={PlacePage} options={{headerBackTitleStyle: false, headerTitle: ''}}/>
+                    <Stack.Screen
+                        name="PlacePage"
+                        component={PlacePage}
+                        options={{
+                            headerBackTitleStyle: false,
+                            headerTitle: "",
+                        }}
+                    />
                 </Stack.Navigator>
 
                 {/* Create Modal Starts here! */}

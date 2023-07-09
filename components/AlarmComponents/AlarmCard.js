@@ -20,6 +20,8 @@ import {
 } from "../../Crud.js";
 import AppContext from "../../navigation/AppContext.js";
 import { cancelNotification, setNotification } from "../Notification.js";
+import ko from "../../locales/ko.js";
+import en from "../../locales/en.js";
 
 export default function AlarmCard({
     alarm_id,
@@ -95,15 +97,16 @@ export default function AlarmCard({
     const [timeText, setTimeText] = useState("");
 
     useEffect(() => {
-        if (subtract === 0) setTimeText("- Fastest time");
-        else if (subtract === 1) setTimeText("- Average time");
-        else setTimeText("- Slowest time");
+        if (subtract === 0) setTimeText(translations.alarmcard_fastest);
+        else if (subtract === 1) setTimeText(translations.alarmcard_average);
+        else setTimeText(translations.alarmcard_slowest);
     }, [subtract]);
 
     const [arr, setArr] = useState([]);
     const [isEnabled, setIsEnabled] = useState(!!isOn);
     const { setAlarmItems } = useContext(AppContext);
 
+    const translations = global.appLanguage === "ko" ? ko : en;
 
     const toggleSwitch = async () => {
         if (isEnabled) {
@@ -132,7 +135,7 @@ export default function AlarmCard({
                 (title = "From: " + start + " To: " + end),
                 (minus_time = minus_time)
             );
-            console.log("here")
+            // console.log("here")
             updateAlarmOn(
                 (alarm_id = alarm_id),
                 (isOn = 1),

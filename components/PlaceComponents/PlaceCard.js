@@ -24,6 +24,7 @@ export default function PlaceCard({ id, start, end, data }) {
     };
 
     const { isModified, setIsModified } = useContext(AppContext);
+    
     const [arr, setArr] = useState([]);
 
     const iconSettler = (data) => {
