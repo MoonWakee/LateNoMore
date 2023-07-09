@@ -148,7 +148,7 @@ export default function PlacePage({ route }) {
             texter += ' ' + hour + ' ' + translations.sub_hr;
         }
         if (minute > 0) {
-            texter += ' ' + min + ' ' + translations.sub_min;
+            texter += ' ' + minute + ' ' + translations.sub_min;
         }
         texter += ' ' + sec + ' ' + translations.sub_sec;
 
