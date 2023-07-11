@@ -8,7 +8,7 @@ export default {
     modal_alert_locations: "현재 장소와 목적지를 입력해주세요!",
     modal_alert_transportation: "교통수단을 적어도 한 개 선택해주세요!",
     modal_select_transportation: "교통수단을 선택해주세요!",
-    modal_create: "루트 만들기",
+    modal_create: "경로 만들기",
     place_timer: "타이머",
     timer_start: "시작",
     timer_resue: "재개",
